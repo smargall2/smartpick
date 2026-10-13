@@ -46,7 +46,7 @@
     <header class="login-navbar">
 
         <a
-            href="/proyecto/smartpick/logo"
+            href="/proyecto/smartpick/index.php"
             class="login-logo"
         >
 

@@ -60,28 +60,30 @@ $primerItem = $hojaPicking[0];
 <div class="dashboard">
 
 
-    <!-- SIDEBAR -->
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
 
     <aside class="sidebar">
 
 
+        <!-- LOGO -->
+
         <div class="sidebar-logo">
 
-            <img
-                src="img/logoSinFondo.png"
-                alt="SmartPick"
-            >
+            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
 
+
+        <!-- NAVEGACIÓN -->
+
         <nav class="sidebar-menu">
 
+        <!-- DASHBOARD -->
 
-            <a
-                href="index.php?ruta=dashboard"
-                class="menu-item"
-            >
+            <a href="index.php?ruta=dashboard" class="menu-item">
 
                 <i class="bi bi-grid"></i>
 
@@ -89,46 +91,66 @@ $primerItem = $hojaPicking[0];
 
             </a>
 
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+            <!-- CLIENTES -->
 
-    <a
-        href="index.php?ruta=productos"
-        class="menu-item"
-    >
-        <i class="bi bi-box-seam"></i>
-        <span>Productos</span>
-    </a>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-<?php endif; ?>
+            <a href="index.php?ruta=clientes" class="menu-item">
+                
+                <i class="bi bi-person-vcard"></i>
+        
+                <span>Clientes</span>
+            </a>
 
-<?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+            <?php endif; ?>
 
-    <a
-        href="index.php?ruta=inventario"
-        class="menu-item"
-    >
-        <i class="bi bi-boxes"></i>
-        <span>Inventario</span>
-    </a>
+            <!-- INGRESAR PAQUETE -->
 
-<?php endif; ?>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-<a href="index.php?ruta=zonas" class="menu-item">
-    <i class="bi bi-geo-alt"></i>
-    <span>Zonas</span>
-</a>
+            <a href="index.php?ruta=ingresar-paquete" class="menu-item">
+                
+                <i class="bi bi-box-arrow-in-down"></i>
+                
+                <span>Ingresar paquete</span>
+            </a>
 
+            <?php endif; ?>
 
-            <a
-                href="index.php?ruta=pedidos"
-                class="menu-item"
-            >
+            <!-- PRODUCTOS -->
+
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
+
+            <a href="index.php?ruta=productos" class="menu-item">
+                
+                <i class="bi bi-box-seam"></i>
+                
+                <span>Productos</span>
+            </a>
+
+            <?php endif; ?>
+
+            <!-- ZONAS -->
+
+            <a href="index.php?ruta=zonas" class="menu-item">
+                <i class="bi bi-geo-alt"></i>
+                <span>Zonas</span>
+            </a>
+
+            <!-- INVENTARIO -->
+
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
+
+            <a href="index.php?ruta=inventario" class="menu-item">
+                <i class="bi bi-boxes"></i>
+                <span>Inventario</span>
+            </a>
+
+            <?php endif; ?>
+
+            <!-- PEDIDOS -->
+
+            <a href="index.php?ruta=pedidos" class="menu-item">
 
                 <i class="bi bi-clipboard-check"></i>
 
@@ -136,21 +158,42 @@ $primerItem = $hojaPicking[0];
 
             </a>
 
+            <!-- OPERARIOS -->
 
-            <a
-                href="index.php?ruta=picking"
-                class="menu-item activo"
-            >
+            <a href="#" class="menu-item">
 
-                <i class="bi bi-signpost-split"></i>
+                <i class="bi bi-people"></i>
+
+                <span>Operarios</span>
+
+            </a>
+
+            <!-- PICKING -->
+
+            <a href="index.php?ruta=picking" class="menu-item activo">
+
+                <i class="bi bi-signpost-2"></i>
 
                 <span>Picking</span>
+
+            </a>
+
+            <!-- REPORTES -->
+
+            <a href="#" class="menu-item">
+
+                <i class="bi bi-bar-chart"></i>
+
+                <span>Reportes</span>
 
             </a>
 
 
         </nav>
 
+
+
+        <!-- LOGOUT -->
 
         <div class="sidebar-footer">
 
@@ -457,23 +500,18 @@ $primerItem = $hojaPicking[0];
 
                             <?php if (!empty($item['ID_zona'])): ?>
 
-    <a
-        href="index.php?ruta=zonas&destino=<?= (int)$item['ID_zona'] ?>"
-        class="btn-ver-mapa"
-    >
+            <a href="index.php?ruta=zonas&destino=<?= (int)$item['ID_zona'] ?>" class="btn-ver-mapa">
 
-        <i class="bi bi-map"></i>
+                <i class="bi bi-map"></i>
 
-        VER EN MAPA
+                VER EN MAPA
 
-    </a>
+            </a>
 
-<?php endif; ?>
+            <?php endif; ?>
 
 
-                        </div>
-
-
+                    </div>
 
                         <!-- CANTIDAD -->
 
@@ -499,36 +537,36 @@ $primerItem = $hojaPicking[0];
                         <div class="accion-picking">
 
 
-                            <?php if ($confirmado): ?>
+            <?php if ($confirmado): ?>
 
 
-                                <span class="producto-confirmado">
+                        <span class="producto-confirmado">
 
-                                    <i class="bi bi-check-circle-fill"></i>
+                            <i class="bi bi-check-circle-fill"></i>
 
-                                    RETIRADO
+                            RETIRADO
 
-                                </span>
-
-
-                            <?php else: ?>
+                        </span>
 
 
-                                <button
-                                    type="button"
-                                    class="btn-confirmar-picking"
-                                    data-pedido="<?= (int)$item['ID_pedido'] ?>"
-                                    data-producto="<?= (int)$item['ID_producto'] ?>"
-                                >
-
-                                    <i class="bi bi-check2"></i>
-
-                                    CONFIRMAR RETIRO
-
-                                </button>
+            <?php else: ?>
 
 
-                            <?php endif; ?>
+                        <button
+                            type="button"
+                            class="btn-confirmar-picking"
+                            data-pedido="<?= (int)$item['ID_pedido'] ?>"
+                            data-producto="<?= (int)$item['ID_producto'] ?>"
+                        >
+
+                            <i class="bi bi-check2"></i>
+
+                            CONFIRMAR RETIRO
+
+                        </button>
+
+
+            <?php endif; ?>
 
 
                         </div>
@@ -537,13 +575,13 @@ $primerItem = $hojaPicking[0];
                     </div>
 
 
-                <?php
+            <?php
 
-                    $numero++;
+                $numero++;
 
                 endforeach;
 
-                ?>
+            ?>
 
 
             </div>

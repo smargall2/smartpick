@@ -48,21 +48,44 @@ class PickingRepositorio
             INNER JOIN Producto p
                 ON p.ID_producto = c.ID_producto
 
-            WHERE a.CI_operario = :operario
+            WHERE a.CI_operario = ?
 
             AND UPPER(pe.Estado) = 'PREPARANDO'
 
             ORDER BY pe.Fecha_ingresado ASC
         ";
 
-        $stmt =
-            $this->conexion->prepare($sql);
+        $stmt = mysqli_prepare(
+            $this->conexion,
+            $sql
+        );
 
-        $stmt->execute([
-            ':operario' => $ciOperario
-        ]);
+        if (!$stmt) {
+            throw new Exception(
+                mysqli_error($this->conexion)
+            );
+        }
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        mysqli_stmt_bind_param(
+            $stmt,
+            "s",
+            $ciOperario
+        );
+
+        mysqli_stmt_execute($stmt);
+
+        $resultado =
+            mysqli_stmt_get_result($stmt);
+
+        $pedidos =
+            mysqli_fetch_all(
+                $resultado,
+                MYSQLI_ASSOC
+            );
+
+        mysqli_stmt_close($stmt);
+
+        return $pedidos;
     }
 
 
@@ -87,15 +110,35 @@ class PickingRepositorio
 
             FROM Contiene c
 
-            WHERE c.ID_pedido = :pedido
+            WHERE c.ID_pedido = ?
         ";
 
-        $stmt =
-            $this->conexion->prepare($sql);
+        $stmt = mysqli_prepare(
+            $this->conexion,
+            $sql
+        );
 
-        $stmt->execute([
-            ':pedido' => $idPedido
-        ]);
+        if (!$stmt) {
+            throw new Exception(
+                mysqli_error($this->conexion)
+            );
+        }
+
+        $idPedido = (int)$idPedido;
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "i",
+            $idPedido
+        );
+
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception(
+                mysqli_stmt_error($stmt)
+            );
+        }
+
+        mysqli_stmt_close($stmt);
     }
 
 
@@ -106,8 +149,9 @@ class PickingRepositorio
     public function obtenerHojaPicking(
         $idPedido,
         $ciOperario
-    )
-    {
+    ) {
+        $idPedido = (int)$idPedido;
+
         $this->inicializarPicking($idPedido);
 
 
@@ -165,9 +209,9 @@ class PickingRepositorio
                 ON pd.ID_pedido = pe.ID_pedido
                 AND pd.ID_producto = p.ID_producto
 
-            WHERE pe.ID_pedido = :pedido
+            WHERE pe.ID_pedido = ?
 
-            AND a.CI_operario = :operario
+            AND a.CI_operario = ?
 
             AND UPPER(pe.Estado) = 'PREPARANDO'
 
@@ -178,15 +222,38 @@ class PickingRepositorio
                 p.Descripcion ASC
         ";
 
-        $stmt =
-            $this->conexion->prepare($sql);
+        $stmt = mysqli_prepare(
+            $this->conexion,
+            $sql
+        );
 
-        $stmt->execute([
-            ':pedido' => $idPedido,
-            ':operario' => $ciOperario
-        ]);
+        if (!$stmt) {
+            throw new Exception(
+                mysqli_error($this->conexion)
+            );
+        }
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        mysqli_stmt_bind_param(
+            $stmt,
+            "is",
+            $idPedido,
+            $ciOperario
+        );
+
+        mysqli_stmt_execute($stmt);
+
+        $resultado =
+            mysqli_stmt_get_result($stmt);
+
+        $hoja =
+            mysqli_fetch_all(
+                $resultado,
+                MYSQLI_ASSOC
+            );
+
+        mysqli_stmt_close($stmt);
+
+        return $hoja;
     }
 
 
@@ -198,11 +265,15 @@ class PickingRepositorio
         $idPedido,
         $idProducto,
         $ciOperario
-    )
-    {
+    ) {
         try {
 
-            $this->conexion->beginTransaction();
+            mysqli_begin_transaction(
+                $this->conexion
+            );
+
+            $idPedido = (int)$idPedido;
+            $idProducto = (int)$idProducto;
 
 
             // =========================================
@@ -219,9 +290,9 @@ class PickingRepositorio
                 INNER JOIN Atiende a
                     ON a.ID_pedido = pe.ID_pedido
 
-                WHERE pe.ID_pedido = :pedido
+                WHERE pe.ID_pedido = ?
 
-                AND a.CI_operario = :operario
+                AND a.CI_operario = ?
 
                 AND UPPER(pe.Estado) = 'PREPARANDO'
 
@@ -230,16 +301,37 @@ class PickingRepositorio
                 FOR UPDATE
             ";
 
-            $stmtPedido =
-                $this->conexion->prepare($sqlPedido);
+            $stmtPedido = mysqli_prepare(
+                $this->conexion,
+                $sqlPedido
+            );
 
-            $stmtPedido->execute([
-                ':pedido' => $idPedido,
-                ':operario' => $ciOperario
-            ]);
+            if (!$stmtPedido) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtPedido,
+                "is",
+                $idPedido,
+                $ciOperario
+            );
+
+            mysqli_stmt_execute($stmtPedido);
+
+            $resultadoPedido =
+                mysqli_stmt_get_result(
+                    $stmtPedido
+                );
 
             $pedido =
-                $stmtPedido->fetch(PDO::FETCH_ASSOC);
+                mysqli_fetch_assoc(
+                    $resultadoPedido
+                );
+
+            mysqli_stmt_close($stmtPedido);
 
 
             if (!$pedido) {
@@ -266,25 +358,46 @@ class PickingRepositorio
                 INNER JOIN Producto p
                     ON p.ID_producto = c.ID_producto
 
-                WHERE c.ID_pedido = :pedido
+                WHERE c.ID_pedido = ?
 
-                AND c.ID_producto = :producto
+                AND c.ID_producto = ?
 
                 LIMIT 1
 
                 FOR UPDATE
             ";
 
-            $stmtProducto =
-                $this->conexion->prepare($sqlProducto);
+            $stmtProducto = mysqli_prepare(
+                $this->conexion,
+                $sqlProducto
+            );
 
-            $stmtProducto->execute([
-                ':pedido' => $idPedido,
-                ':producto' => $idProducto
-            ]);
+            if (!$stmtProducto) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtProducto,
+                "ii",
+                $idPedido,
+                $idProducto
+            );
+
+            mysqli_stmt_execute($stmtProducto);
+
+            $resultadoProducto =
+                mysqli_stmt_get_result(
+                    $stmtProducto
+                );
 
             $producto =
-                $stmtProducto->fetch(PDO::FETCH_ASSOC);
+                mysqli_fetch_assoc(
+                    $resultadoProducto
+                );
+
+            mysqli_stmt_close($stmtProducto);
 
 
             if (!$producto) {
@@ -305,25 +418,46 @@ class PickingRepositorio
 
                 FROM PickingDetalle
 
-                WHERE ID_pedido = :pedido
+                WHERE ID_pedido = ?
 
-                AND ID_producto = :producto
+                AND ID_producto = ?
 
                 LIMIT 1
 
                 FOR UPDATE
             ";
 
-            $stmtPicking =
-                $this->conexion->prepare($sqlPicking);
+            $stmtPicking = mysqli_prepare(
+                $this->conexion,
+                $sqlPicking
+            );
 
-            $stmtPicking->execute([
-                ':pedido' => $idPedido,
-                ':producto' => $idProducto
-            ]);
+            if (!$stmtPicking) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtPicking,
+                "ii",
+                $idPedido,
+                $idProducto
+            );
+
+            mysqli_stmt_execute($stmtPicking);
+
+            $resultadoPicking =
+                mysqli_stmt_get_result(
+                    $stmtPicking
+                );
 
             $detalle =
-                $stmtPicking->fetch(PDO::FETCH_ASSOC);
+                mysqli_fetch_assoc(
+                    $resultadoPicking
+                );
+
+            mysqli_stmt_close($stmtPicking);
 
 
             if (!$detalle) {
@@ -334,7 +468,9 @@ class PickingRepositorio
             }
 
 
-            if ((int)$detalle['Confirmado'] === 1) {
+            if (
+                (int)$detalle['Confirmado'] === 1
+            ) {
 
                 throw new Exception(
                     "Este elemento ya fue confirmado."
@@ -371,18 +507,44 @@ class PickingRepositorio
                     UPDATE Producto
 
                     SET Stock_actual =
-                        Stock_actual - :cantidad
+                        Stock_actual - ?
 
-                    WHERE ID_producto = :producto
+                    WHERE ID_producto = ?
                 ";
 
-                $stmtStock =
-                    $this->conexion->prepare($sqlStock);
+                $stmtStock = mysqli_prepare(
+                    $this->conexion,
+                    $sqlStock
+                );
 
-                $stmtStock->execute([
-                    ':cantidad' => $cantidad,
-                    ':producto' => $idProducto
-                ]);
+                if (!$stmtStock) {
+                    throw new Exception(
+                        mysqli_error(
+                            $this->conexion
+                        )
+                    );
+                }
+
+                mysqli_stmt_bind_param(
+                    $stmtStock,
+                    "ii",
+                    $cantidad,
+                    $idProducto
+                );
+
+
+                if (!mysqli_stmt_execute(
+                    $stmtStock
+                )) {
+
+                    throw new Exception(
+                        mysqli_stmt_error(
+                            $stmtStock
+                        )
+                    );
+                }
+
+                mysqli_stmt_close($stmtStock);
             }
 
 
@@ -396,21 +558,45 @@ class PickingRepositorio
                 SET
                     Confirmado = 1,
                     Fecha_confirmacion = NOW(),
-                    CI_operario = :operario
+                    CI_operario = ?
 
-                WHERE ID_pedido = :pedido
+                WHERE ID_pedido = ?
 
-                AND ID_producto = :producto
+                AND ID_producto = ?
             ";
 
-            $stmtConfirmar =
-                $this->conexion->prepare($sqlConfirmar);
+            $stmtConfirmar = mysqli_prepare(
+                $this->conexion,
+                $sqlConfirmar
+            );
 
-            $stmtConfirmar->execute([
-                ':operario' => $ciOperario,
-                ':pedido' => $idPedido,
-                ':producto' => $idProducto
-            ]);
+            if (!$stmtConfirmar) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtConfirmar,
+                "sii",
+                $ciOperario,
+                $idPedido,
+                $idProducto
+            );
+
+
+            if (!mysqli_stmt_execute(
+                $stmtConfirmar
+            )) {
+
+                throw new Exception(
+                    mysqli_stmt_error(
+                        $stmtConfirmar
+                    )
+                );
+            }
+
+            mysqli_stmt_close($stmtConfirmar);
 
 
             // =========================================
@@ -423,20 +609,45 @@ class PickingRepositorio
 
                 FROM PickingDetalle
 
-                WHERE ID_pedido = :pedido
+                WHERE ID_pedido = ?
 
                 AND Confirmado = 0
             ";
 
-            $stmtPendientes =
-                $this->conexion->prepare($sqlPendientes);
+            $stmtPendientes = mysqli_prepare(
+                $this->conexion,
+                $sqlPendientes
+            );
 
-            $stmtPendientes->execute([
-                ':pedido' => $idPedido
-            ]);
+            if (!$stmtPendientes) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtPendientes,
+                "i",
+                $idPedido
+            );
+
+            mysqli_stmt_execute(
+                $stmtPendientes
+            );
+
+            $resultadoPendientes =
+                mysqli_stmt_get_result(
+                    $stmtPendientes
+                );
 
             $resultado =
-                $stmtPendientes->fetch(PDO::FETCH_ASSOC);
+                mysqli_fetch_assoc(
+                    $resultadoPendientes
+                );
+
+            mysqli_stmt_close(
+                $stmtPendientes
+            );
 
 
             $terminado =
@@ -452,35 +663,65 @@ class PickingRepositorio
                 $sqlEstado = "
                     UPDATE Pedido
 
-                    SET Estado = 'LISTO_PARA_VALIDAR'
+                    SET Estado =
+                        'LISTO_PARA_VALIDAR'
 
-                    WHERE ID_pedido = :pedido
+                    WHERE ID_pedido = ?
                 ";
 
-                $stmtEstado =
-                    $this->conexion->prepare($sqlEstado);
+                $stmtEstado = mysqli_prepare(
+                    $this->conexion,
+                    $sqlEstado
+                );
 
-                $stmtEstado->execute([
-                    ':pedido' => $idPedido
-                ]);
+                if (!$stmtEstado) {
+                    throw new Exception(
+                        mysqli_error(
+                            $this->conexion
+                        )
+                    );
+                }
+
+                mysqli_stmt_bind_param(
+                    $stmtEstado,
+                    "i",
+                    $idPedido
+                );
+
+
+                if (!mysqli_stmt_execute(
+                    $stmtEstado
+                )) {
+
+                    throw new Exception(
+                        mysqli_stmt_error(
+                            $stmtEstado
+                        )
+                    );
+                }
+
+                mysqli_stmt_close($stmtEstado);
             }
 
 
-            $this->conexion->commit();
+            mysqli_commit(
+                $this->conexion
+            );
 
 
             return [
                 'ok' => true,
                 'terminado' => $terminado,
-                'tipo' => strtoupper($producto['Tipo'])
+                'tipo' =>
+                    strtoupper($producto['Tipo'])
             ];
 
 
         } catch (Exception $e) {
 
-            if ($this->conexion->inTransaction()) {
-                $this->conexion->rollBack();
-            }
+            mysqli_rollback(
+                $this->conexion
+            );
 
             throw $e;
         }

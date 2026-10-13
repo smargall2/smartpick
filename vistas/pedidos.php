@@ -43,6 +43,48 @@ $usuario = $_SESSION['usuario'];
         href="/proyecto/smartpick/css/pedidos.css"
     >
 
+    <!-- ==========================================
+         PEDIDO MODIFICADO DESTACADO
+    =========================================== -->
+
+    <style>
+
+        .tabla-pedidos tbody tr.pedido-destacado {
+            background: rgba(90, 173, 177, 0.14);
+            box-shadow: inset 4px 0 0 #5aadb1;
+            animation: resaltarPedido 1.2s ease;
+        }
+
+        .tabla-pedidos tbody tr.pedido-destacado td:first-child strong::after {
+            content: " MODIFICADO";
+            display: inline-block;
+            margin-left: 8px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: #102f4f;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            vertical-align: middle;
+        }
+
+        @keyframes resaltarPedido {
+
+            0% {
+                opacity: .45;
+                transform: translateY(-3px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+
 </head>
 
 <body>
@@ -51,9 +93,14 @@ $usuario = $_SESSION['usuario'];
 <div class="dashboard">
 
 
-    <!-- SIDEBAR -->
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
 
     <aside class="sidebar">
+
+
+        <!-- LOGO -->
 
         <div class="sidebar-logo">
 
@@ -65,7 +112,13 @@ $usuario = $_SESSION['usuario'];
         </div>
 
 
+
+        <!-- NAVEGACIÓN -->
+
         <nav class="sidebar-menu">
+
+
+            <!-- DASHBOARD -->
 
             <a
                 href="index.php?ruta=dashboard"
@@ -78,73 +131,106 @@ $usuario = $_SESSION['usuario'];
 
             </a>
 
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
 
-    <a
-        href="index.php?ruta=clientes"
-        class="menu-item"
-    >
-        <i class="bi bi-person-vcard"></i>
-        <span>Clientes</span>
-    </a>
-
-<?php endif; ?>
-
-<?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
-
-    <a
-        href="index.php?ruta=ingresar-paquete"
-        class="menu-item"
-    >
-        <i class="bi bi-box-arrow-in-down"></i>
-        <span>Ingresar paquete</span>
-    </a>
-
-<?php endif; ?>
+            <!-- CLIENTES -->
 
             <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+                strtolower($_SESSION['usuario']['rol'])
+                === 'administrador'
+            ): ?>
 
-    <a
-        href="index.php?ruta=productos"
-        class="menu-item"
-    >
-        <i class="bi bi-box-seam"></i>
-        <span>Productos</span>
-    </a>
+                <a
+                    href="index.php?ruta=clientes"
+                    class="menu-item"
+                >
 
-<?php endif; ?>
+                    <i class="bi bi-person-vcard"></i>
+
+                    <span>Clientes</span>
+
+                </a>
+
+            <?php endif; ?>
 
 
-            <a href="index.php?ruta=zonas" class="menu-item active">
-    <i class="bi bi-geo-alt"></i>
-    <span>Zonas</span>
-</a>
-
+            <!-- INGRESAR PAQUETE -->
 
             <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+                strtolower($_SESSION['usuario']['rol'])
+                === 'administrador'
+            ): ?>
 
-    <a
-        href="index.php?ruta=inventario"
-        class="menu-item"
-    >
-        <i class="bi bi-boxes"></i>
-        <span>Inventario</span>
-    </a>
+                <a
+                    href="index.php?ruta=ingresar-paquete"
+                    class="menu-item"
+                >
 
-<?php endif; ?>
+                    <i class="bi bi-box-arrow-in-down"></i>
 
+                    <span>Ingresar paquete</span>
+
+                </a>
+
+            <?php endif; ?>
+
+
+            <!-- PRODUCTOS -->
+
+            <?php if (
+                strtolower($_SESSION['usuario']['rol'])
+                === 'administrador'
+            ): ?>
+
+                <a
+                    href="index.php?ruta=productos"
+                    class="menu-item"
+                >
+
+                    <i class="bi bi-box-seam"></i>
+
+                    <span>Productos</span>
+
+                </a>
+
+            <?php endif; ?>
+
+
+            <!-- ZONAS -->
+
+            <a
+                href="index.php?ruta=zonas"
+                class="menu-item"
+            >
+
+                <i class="bi bi-geo-alt"></i>
+
+                <span>Zonas</span>
+
+            </a>
+
+
+            <!-- INVENTARIO -->
+
+            <?php if (
+                strtolower($_SESSION['usuario']['rol'])
+                === 'administrador'
+            ): ?>
+
+                <a
+                    href="index.php?ruta=inventario"
+                    class="menu-item"
+                >
+
+                    <i class="bi bi-boxes"></i>
+
+                    <span>Inventario</span>
+
+                </a>
+
+            <?php endif; ?>
+
+
+            <!-- PEDIDOS -->
 
             <a
                 href="index.php?ruta=pedidos"
@@ -158,7 +244,12 @@ $usuario = $_SESSION['usuario'];
             </a>
 
 
-            <a href="#" class="menu-item">
+            <!-- OPERARIOS -->
+
+            <a
+                href="#"
+                class="menu-item"
+            >
 
                 <i class="bi bi-people"></i>
 
@@ -167,7 +258,12 @@ $usuario = $_SESSION['usuario'];
             </a>
 
 
-            <a href="index.php?ruta=picking" class="menu-item">
+            <!-- PICKING -->
+
+            <a
+                href="index.php?ruta=picking"
+                class="menu-item"
+            >
 
                 <i class="bi bi-signpost-2"></i>
 
@@ -176,7 +272,12 @@ $usuario = $_SESSION['usuario'];
             </a>
 
 
-            <a href="#" class="menu-item">
+            <!-- REPORTES -->
+
+            <a
+                href="#"
+                class="menu-item"
+            >
 
                 <i class="bi bi-bar-chart"></i>
 
@@ -184,8 +285,12 @@ $usuario = $_SESSION['usuario'];
 
             </a>
 
+
         </nav>
 
+
+
+        <!-- LOGOUT -->
 
         <div class="sidebar-footer">
 
@@ -202,14 +307,19 @@ $usuario = $_SESSION['usuario'];
 
         </div>
 
+
     </aside>
 
 
 
-    <!-- CONTENIDO -->
+    <!-- ==========================================
+         CONTENIDO
+    =========================================== -->
 
     <main class="main-content">
 
+
+        <!-- TOPBAR -->
 
         <header class="topbar">
 
@@ -251,8 +361,14 @@ $usuario = $_SESSION['usuario'];
 
 
 
+        <!-- ==========================================
+             CONTENIDO PEDIDOS
+        =========================================== -->
+
         <section class="pedidos-contenido">
 
+
+            <!-- CABECERA -->
 
             <div class="pedidos-cabecera">
 
@@ -288,7 +404,9 @@ $usuario = $_SESSION['usuario'];
 
 
 
-            <!-- FILTROS -->
+            <!-- ==========================================
+                 FILTROS
+            =========================================== -->
 
             <div class="pedidos-filtros">
 
@@ -298,7 +416,8 @@ $usuario = $_SESSION['usuario'];
                     <i class="bi bi-search"></i>
 
                     <input
-                        type="text" id="buscarPedido"
+                        type="text"
+                        id="buscarPedido"
                         placeholder="Buscar pedido..."
                     >
 
@@ -306,7 +425,10 @@ $usuario = $_SESSION['usuario'];
 
 
                 <select id="filtroEstado">
-                    <option value="">Todos los estados</option>
+
+                    <option value="">
+                        Todos los estados
+                    </option>
 
                     <option value="pendiente">
                         Pendiente
@@ -336,9 +458,10 @@ $usuario = $_SESSION['usuario'];
                         Listo para validar
                     </option>
 
-                    <option value="PENDIENTE_RETIRO">
+                    <option value="pendiente_retiro">
                         Pendiente de retiro
                     </option>
+
                 </select>
 
 
@@ -346,7 +469,9 @@ $usuario = $_SESSION['usuario'];
 
 
 
-            <!-- TABLA -->
+            <!-- ==========================================
+                 TABLA
+            =========================================== -->
 
             <div class="panel-pedidos">
 
@@ -375,224 +500,297 @@ $usuario = $_SESSION['usuario'];
 
                         <tbody>
 
-<?php if (!empty($pedidos)): ?>
 
+                        <?php if (!empty($pedidos)): ?>
 
-    <?php foreach ($pedidos as $pedido): ?>
 
+                            <?php foreach ($pedidos as $pedido): ?>
 
-        <tr
-    class="fila-pedido"
-    data-id="<?= $pedido['ID_pedido'] ?>"
-    data-estado="<?= strtolower(htmlspecialchars($pedido['Estado'])) ?>"
-    data-fecha="<?= htmlspecialchars($pedido['Fecha_ingresado']) ?>"
->
 
+                                <?php
 
-            <!-- ID -->
+                                $esPedidoDestacado =
+                                    isset($pedidoDestacado)
+                                    &&
+                                    (int)$pedidoDestacado
+                                    ===
+                                    (int)$pedido['ID_pedido'];
 
-            <td>
+                                ?>
 
-                <strong>
-                    #<?= htmlspecialchars($pedido['ID_pedido']) ?>
-                </strong>
 
-            </td>
+                                <tr
+                                    class="fila-pedido <?= $esPedidoDestacado ? 'pedido-destacado' : '' ?>"
+                                    data-id="<?= (int)$pedido['ID_pedido'] ?>"
+                                    data-estado="<?= strtolower(htmlspecialchars($pedido['Estado'])) ?>"
+                                    data-fecha="<?= htmlspecialchars($pedido['Fecha_ingresado'] ?? '') ?>"
+                                >
 
 
+                                    <!-- ID -->
 
-            <!-- FECHA INGRESO -->
+                                    <td>
 
-            <td>
+                                        <strong>
+                                            #<?= htmlspecialchars($pedido['ID_pedido']) ?>
+                                        </strong>
 
-                <?php
+                                    </td>
 
-                if (!empty($pedido['Fecha_ingresado'])) {
 
-                    echo date(
-                        'd/m/Y',
-                        strtotime($pedido['Fecha_ingresado'])
-                    );
 
-                } else {
+                                    <!-- FECHA INGRESO -->
 
-                    echo '-';
+                                    <td>
 
-                }
+                                        <?php
 
-                ?>
+                                        if (!empty($pedido['Fecha_ingresado'])) {
 
-            </td>
+                                            echo date(
+                                                'd/m/Y',
+                                                strtotime(
+                                                    $pedido['Fecha_ingresado']
+                                                )
+                                            );
 
+                                        } else {
 
+                                            echo '-';
 
-            <!-- ESTADO -->
+                                        }
 
-            <td>
+                                        ?>
 
-                <?php
+                                    </td>
 
-                $estado = strtolower($pedido['Estado']);
 
-                $claseEstado = 'estado-pendiente';
 
+                                    <!-- ESTADO -->
 
-                if ($estado === 'preparando') {
+                                    <td>
 
-                    $claseEstado = 'estado-proceso';
+                                        <?php
 
-                } elseif ($estado === 'entregado') {
+                                        $estado =
+                                            strtolower(
+                                                $pedido['Estado']
+                                            );
 
-                    $claseEstado = 'estado-entregado';
+                                        $claseEstado =
+                                            'estado-pendiente';
 
-                } elseif ($estado === 'retirado') {
 
-                    $claseEstado = 'estado-retirado';
+                                        if (
+                                            $estado === 'preparando'
+                                        ) {
 
-                } elseif ($estado === 'almacenado') {
+                                            $claseEstado =
+                                                'estado-proceso';
 
-                    $claseEstado = 'estado-almacenado';
+                                        } elseif (
+                                            $estado === 'entregado'
+                                        ) {
 
-                } elseif ($estado === 'ingresado') {
+                                            $claseEstado =
+                                                'estado-entregado';
 
-                    $claseEstado = 'estado-ingresado';
-                }elseif ($estado === 'listo_para_validar') {
+                                        } elseif (
+                                            $estado === 'retirado'
+                                        ) {
 
-                    $claseEstado = 'estado-validar';
-                }
+                                            $claseEstado =
+                                                'estado-retirado';
 
-                ?>
+                                        } elseif (
+                                            $estado === 'almacenado'
+                                        ) {
 
+                                            $claseEstado =
+                                                'estado-almacenado';
 
-                <span
-                    class="estado <?= $claseEstado ?>"
-                >
+                                        } elseif (
+                                            $estado === 'ingresado'
+                                        ) {
 
-                    <?php
+                                            $claseEstado =
+                                                'estado-ingresado';
 
-$estadoTexto =
-    $pedido['Estado'];
+                                        } elseif (
+                                            $estado ===
+                                            'listo_para_validar'
+                                        ) {
 
+                                            $claseEstado =
+                                                'estado-validar';
 
-if (
-    strtoupper($estadoTexto)
-    === 'LISTO_PARA_VALIDAR'
-) {
+                                        } elseif (
+                                            $estado ===
+                                            'pendiente_retiro'
+                                        ) {
 
-    $estadoTexto =
-        'LISTO PARA VALIDAR';
-}
+                                            $claseEstado =
+                                                'estado-proceso';
+                                        }
 
-?>
 
-<span class="<?= $claseEstado ?>">
+                                        $estadoTexto =
+                                            $pedido['Estado'];
 
-    <?= htmlspecialchars($estadoTexto) ?>
 
-</span>
+                                        if (
+                                            strtoupper($estadoTexto)
+                                            === 'LISTO_PARA_VALIDAR'
+                                        ) {
 
-                </span>
+                                            $estadoTexto =
+                                                'LISTO PARA VALIDAR';
 
-            </td>
+                                        } elseif (
+                                            strtoupper($estadoTexto)
+                                            === 'PENDIENTE_RETIRO'
+                                        ) {
 
+                                            $estadoTexto =
+                                                'PENDIENTE DE RETIRO';
+                                        }
 
+                                        ?>
 
-            <!-- FECHA ENTREGA -->
 
-            <td>
+                                        <span
+                                            class="estado <?= $claseEstado ?>"
+                                        >
 
-                <?php
+                                            <?= htmlspecialchars($estadoTexto) ?>
 
-                if (!empty($pedido['Fecha_entregado'])) {
+                                        </span>
 
-                    echo date(
-                        'd/m/Y',
-                        strtotime($pedido['Fecha_entregado'])
-                    );
+                                    </td>
 
-                } else {
 
-                    echo '-';
 
-                }
+                                    <!-- FECHA ENTREGA -->
 
-                ?>
+                                    <td>
 
-            </td>
+                                        <?php
 
+                                        if (
+                                            !empty(
+                                                $pedido['Fecha_entregado']
+                                            )
+                                        ) {
 
+                                            echo date(
+                                                'd/m/Y',
+                                                strtotime(
+                                                    $pedido['Fecha_entregado']
+                                                )
+                                            );
 
-            <!-- ACCIONES -->
+                                        } else {
 
-            <td>
+                                            echo '-';
 
+                                        }
 
-                <div class="acciones-tabla">
+                                        ?>
 
+                                    </td>
 
-                    <a
-                        href="index.php?ruta=ver-pedido&id=<?= $pedido['ID_pedido'] ?>"
-                        class="btn-accion btn-ver"
-                    >
-                        <i class="bi bi-eye"></i>
-                    </a>
 
 
-                    <?php if (
-                        $usuario['rol'] === 'Administrador'
-                    ): ?>
+                                    <!-- ACCIONES -->
 
+                                    <td>
 
-                        <a
-                            href="index.php?ruta=editar-pedido&id=<?= $pedido['ID_pedido'] ?>"
-                            class="btn-accion btn-editar"
-                            title="Editar pedido"
-                        >
+                                        <div class="acciones-tabla">
 
-                            <i class="bi bi-pencil"></i>
 
-                        </a>
+                                            <!-- VER PEDIDO -->
 
+                                            <a
+                                                href="index.php?ruta=ver-pedido&id=<?= (int)$pedido['ID_pedido'] ?>"
+                                                class="btn-accion btn-ver"
+                                                title="Ver pedido"
+                                            >
 
-                    <?php endif; ?>
+                                                <i class="bi bi-eye"></i>
 
+                                            </a>
 
-                </div>
 
 
-            </td>
+                                            <!--
+                                                MODIFICAR PEDIDO
 
+                                                Solamente aparece si:
+                                                1. El usuario es administrador.
+                                                2. El pedido está PENDIENTE.
+                                            -->
 
-        </tr>
+                                            <?php if (
+                                                strtolower($usuario['rol'])
+                                                === 'administrador'
+                                                &&
+                                                strtoupper(
+                                                    $pedido['Estado']
+                                                )
+                                                === 'PENDIENTE'
+                                            ): ?>
 
 
-    <?php endforeach; ?>
+                                                <a
+                                                    href="index.php?ruta=editar-pedido&id=<?= (int)$pedido['ID_pedido'] ?>"
+                                                    class="btn-accion btn-editar"
+                                                    title="Modificar pedido"
+                                                >
 
+                                                    <i class="bi bi-pencil"></i>
 
-<?php else: ?>
+                                                </a>
 
 
-    <tr>
+                                            <?php endif; ?>
 
-        <td
-            colspan="5"
-            class="tabla-vacia"
-        >
 
-            <i class="bi bi-inbox"></i>
+                                        </div>
 
-            <p>
-                No hay pedidos registrados.
-            </p>
+                                    </td>
 
-        </td>
 
-    </tr>
+                                </tr>
 
 
-<?php endif; ?>
+                            <?php endforeach; ?>
 
-</tbody>
+
+                        <?php else: ?>
+
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    class="tabla-vacia"
+                                >
+
+                                    <i class="bi bi-inbox"></i>
+
+                                    <p>
+                                        No hay pedidos registrados.
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+
+                        <?php endif; ?>
+
+
+                        </tbody>
 
                     </table>
 
@@ -606,7 +804,14 @@ if (
 
     </main>
 
+
 </div>
+
+
+
+<!-- ==========================================
+     FILTROS
+=========================================== -->
 
 <script>
 
@@ -619,6 +824,7 @@ const filtroEstado =
 
 function filtrarPedidos()
 {
+
     const texto =
         buscarPedido.value
             .trim()
@@ -680,9 +886,11 @@ function filtrarPedidos()
         } else {
 
             fila.style.display = 'none';
+
         }
 
     });
+
 }
 
 
@@ -698,6 +906,7 @@ filtroEstado.addEventListener(
 );
 
 </script>
+
 
 </body>
 

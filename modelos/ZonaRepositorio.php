@@ -39,11 +39,25 @@ class ZonaRepositorio
                 z.Estante ASC
         ";
 
-        $stmt = $this->conexion->prepare($sql);
+        $resultado = mysqli_query(
+            $this->conexion,
+            $sql
+        );
 
-        $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!$resultado) {
+
+            throw new Exception(
+                "Error al obtener las zonas: " .
+                mysqli_error($this->conexion)
+            );
+        }
+
+
+        return mysqli_fetch_all(
+            $resultado,
+            MYSQLI_ASSOC
+        );
     }
 
 
@@ -68,21 +82,56 @@ class ZonaRepositorio
             INNER JOIN deposito d
                 ON d.ID_deposito = z.ID_deposito
 
-            WHERE z.ID_zona = :id
+            WHERE z.ID_zona = ?
 
             LIMIT 1
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-
-        $stmt->bindValue(
-            ':id',
-            $idZona,
-            PDO::PARAM_INT
+        $stmt = mysqli_prepare(
+            $this->conexion,
+            $sql
         );
 
-        $stmt->execute();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$stmt) {
+
+            throw new Exception(
+                "Error al preparar la consulta: " .
+                mysqli_error($this->conexion)
+            );
+        }
+
+
+        $idZona = (int)$idZona;
+
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "i",
+            $idZona
+        );
+
+
+        if (!mysqli_stmt_execute($stmt)) {
+
+            throw new Exception(
+                "Error al buscar la zona: " .
+                mysqli_stmt_error($stmt)
+            );
+        }
+
+
+        $resultado =
+            mysqli_stmt_get_result($stmt);
+
+
+        $zona =
+            mysqli_fetch_assoc($resultado);
+
+
+        mysqli_stmt_close($stmt);
+
+
+        return $zona;
     }
 }

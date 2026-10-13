@@ -23,7 +23,11 @@ class PaqueteRepositorio
     ) {
         try {
 
-            $this->conexion->beginTransaction();
+            mysqli_begin_transaction(
+                $this->conexion
+            );
+
+            $idZona = (int)$idZona;
 
 
             // ==========================================
@@ -32,20 +36,53 @@ class PaqueteRepositorio
 
             $sqlCliente = "
                 SELECT CI_cliente
+
                 FROM cliente
-                WHERE CI_cliente = :ci
+
+                WHERE CI_cliente = ?
+
                 LIMIT 1
+
                 FOR UPDATE
             ";
 
-            $stmtCliente =
-                $this->conexion->prepare($sqlCliente);
+            $stmtCliente = mysqli_prepare(
+                $this->conexion,
+                $sqlCliente
+            );
 
-            $stmtCliente->execute([
-                ':ci' => $ciCliente
-            ]);
+            if (!$stmtCliente) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
 
-            if (!$stmtCliente->fetch()) {
+            mysqli_stmt_bind_param(
+                $stmtCliente,
+                "s",
+                $ciCliente
+            );
+
+            mysqli_stmt_execute(
+                $stmtCliente
+            );
+
+            $resultadoCliente =
+                mysqli_stmt_get_result(
+                    $stmtCliente
+                );
+
+            $cliente =
+                mysqli_fetch_assoc(
+                    $resultadoCliente
+                );
+
+            mysqli_stmt_close(
+                $stmtCliente
+            );
+
+
+            if (!$cliente) {
 
                 throw new Exception(
                     "El cliente seleccionado no existe."
@@ -59,20 +96,53 @@ class PaqueteRepositorio
 
             $sqlZona = "
                 SELECT ID_zona
+
                 FROM zona
-                WHERE ID_zona = :zona
+
+                WHERE ID_zona = ?
+
                 LIMIT 1
+
                 FOR UPDATE
             ";
 
-            $stmtZona =
-                $this->conexion->prepare($sqlZona);
+            $stmtZona = mysqli_prepare(
+                $this->conexion,
+                $sqlZona
+            );
 
-            $stmtZona->execute([
-                ':zona' => $idZona
-            ]);
+            if (!$stmtZona) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
 
-            if (!$stmtZona->fetch()) {
+            mysqli_stmt_bind_param(
+                $stmtZona,
+                "i",
+                $idZona
+            );
+
+            mysqli_stmt_execute(
+                $stmtZona
+            );
+
+            $resultadoZona =
+                mysqli_stmt_get_result(
+                    $stmtZona
+                );
+
+            $zona =
+                mysqli_fetch_assoc(
+                    $resultadoZona
+                );
+
+            mysqli_stmt_close(
+                $stmtZona
+            );
+
+
+            if (!$zona) {
 
                 throw new Exception(
                     "La ubicación seleccionada no existe."
@@ -96,23 +166,53 @@ class PaqueteRepositorio
                 VALUES
                 (
                     'DEPOSITO',
-                    :descripcion,
+                    ?,
                     1,
                     0,
-                    :categoria
+                    ?
                 )
             ";
 
-            $stmtProducto =
-                $this->conexion->prepare($sqlProducto);
+            $stmtProducto = mysqli_prepare(
+                $this->conexion,
+                $sqlProducto
+            );
 
-            $stmtProducto->execute([
-                ':descripcion' => $descripcion,
-                ':categoria' => $categoria
-            ]);
+            if (!$stmtProducto) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtProducto,
+                "ss",
+                $descripcion,
+                $categoria
+            );
+
+
+            if (!mysqli_stmt_execute(
+                $stmtProducto
+            )) {
+
+                throw new Exception(
+                    mysqli_stmt_error(
+                        $stmtProducto
+                    )
+                );
+            }
+
+
+            mysqli_stmt_close(
+                $stmtProducto
+            );
+
 
             $idProducto =
-                (int)$this->conexion->lastInsertId();
+                mysqli_insert_id(
+                    $this->conexion
+                );
 
 
             // ==========================================
@@ -134,13 +234,27 @@ class PaqueteRepositorio
                 )
             ";
 
-            $stmtPedido =
-                $this->conexion->prepare($sqlPedido);
+            $resultadoPedido =
+                mysqli_query(
+                    $this->conexion,
+                    $sqlPedido
+                );
 
-            $stmtPedido->execute();
+
+            if (!$resultadoPedido) {
+
+                throw new Exception(
+                    mysqli_error(
+                        $this->conexion
+                    )
+                );
+            }
+
 
             $idPedido =
-                (int)$this->conexion->lastInsertId();
+                mysqli_insert_id(
+                    $this->conexion
+                );
 
 
             // ==========================================
@@ -155,18 +269,45 @@ class PaqueteRepositorio
                 )
                 VALUES
                 (
-                    :pedido,
-                    :cliente
+                    ?,
+                    ?
                 )
             ";
 
-            $stmtRecibe =
-                $this->conexion->prepare($sqlRecibe);
+            $stmtRecibe = mysqli_prepare(
+                $this->conexion,
+                $sqlRecibe
+            );
 
-            $stmtRecibe->execute([
-                ':pedido' => $idPedido,
-                ':cliente' => $ciCliente
-            ]);
+            if (!$stmtRecibe) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtRecibe,
+                "is",
+                $idPedido,
+                $ciCliente
+            );
+
+
+            if (!mysqli_stmt_execute(
+                $stmtRecibe
+            )) {
+
+                throw new Exception(
+                    mysqli_stmt_error(
+                        $stmtRecibe
+                    )
+                );
+            }
+
+
+            mysqli_stmt_close(
+                $stmtRecibe
+            );
 
 
             // ==========================================
@@ -182,19 +323,46 @@ class PaqueteRepositorio
                 )
                 VALUES
                 (
-                    :pedido,
-                    :producto,
+                    ?,
+                    ?,
                     1
                 )
             ";
 
-            $stmtContiene =
-                $this->conexion->prepare($sqlContiene);
+            $stmtContiene = mysqli_prepare(
+                $this->conexion,
+                $sqlContiene
+            );
 
-            $stmtContiene->execute([
-                ':pedido' => $idPedido,
-                ':producto' => $idProducto
-            ]);
+            if (!$stmtContiene) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtContiene,
+                "ii",
+                $idPedido,
+                $idProducto
+            );
+
+
+            if (!mysqli_stmt_execute(
+                $stmtContiene
+            )) {
+
+                throw new Exception(
+                    mysqli_stmt_error(
+                        $stmtContiene
+                    )
+                );
+            }
+
+
+            mysqli_stmt_close(
+                $stmtContiene
+            );
 
 
             // ==========================================
@@ -209,21 +377,54 @@ class PaqueteRepositorio
                 )
                 VALUES
                 (
-                    :producto,
-                    :zona
+                    ?,
+                    ?
                 )
             ";
 
-            $stmtUbicacion =
-                $this->conexion->prepare($sqlUbicacion);
+            $stmtUbicacion = mysqli_prepare(
+                $this->conexion,
+                $sqlUbicacion
+            );
 
-            $stmtUbicacion->execute([
-                ':producto' => $idProducto,
-                ':zona' => $idZona
-            ]);
+            if (!$stmtUbicacion) {
+                throw new Exception(
+                    mysqli_error($this->conexion)
+                );
+            }
+
+            mysqli_stmt_bind_param(
+                $stmtUbicacion,
+                "ii",
+                $idProducto,
+                $idZona
+            );
 
 
-            $this->conexion->commit();
+            if (!mysqli_stmt_execute(
+                $stmtUbicacion
+            )) {
+
+                throw new Exception(
+                    mysqli_stmt_error(
+                        $stmtUbicacion
+                    )
+                );
+            }
+
+
+            mysqli_stmt_close(
+                $stmtUbicacion
+            );
+
+
+            // ==========================================
+            // CONFIRMAR TRANSACCIÓN
+            // ==========================================
+
+            mysqli_commit(
+                $this->conexion
+            );
 
 
             return [
@@ -234,9 +435,9 @@ class PaqueteRepositorio
 
         } catch (Exception $e) {
 
-            if ($this->conexion->inTransaction()) {
-                $this->conexion->rollBack();
-            }
+            mysqli_rollback(
+                $this->conexion
+            );
 
             throw $e;
         }

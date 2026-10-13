@@ -696,3 +696,68 @@
     }
 
 }
+
+/* ==========================================
+   ACCIONES DEL PEDIDO
+========================================== */
+
+.acciones-pedido {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 18px;
+}
+
+.btn-modificar-pedido {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 11px 18px;
+
+    background: #205b9d;
+    border: 1px solid #205b9d;
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+.btn-modificar-pedido:hover {
+    background: #174a82;
+    border-color: #174a82;
+    color: #ffffff;
+
+    transform: translateY(-1px);
+}
+
+.btn-modificar-pedido i {
+    font-size: 14px;
+}
+
+.btn-modificar-pedido:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 700px) {
+
+    .acciones-pedido {
+        justify-content: stretch;
+    }
+
+    .btn-modificar-pedido {
+        width: 100%;
+    }
+}

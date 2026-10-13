@@ -70,30 +70,30 @@ unset($_SESSION['error_entrega']);
 <div class="dashboard">
 
 
-    <!-- ========================================
+    <!-- ==========================================
          SIDEBAR
-    ========================================= -->
+    =========================================== -->
 
     <aside class="sidebar">
 
 
+        <!-- LOGO -->
+
         <div class="sidebar-logo">
 
-            <img
-                src="img/logoSinFondo.png"
-                alt="SmartPick"
-            >
+            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
 
+
+        <!-- NAVEGACIÓN -->
+
         <nav class="sidebar-menu">
 
+        <!-- DASHBOARD -->
 
-            <a
-                href="index.php?ruta=dashboard"
-                class="menu-item"
-            >
+            <a href="index.php?ruta=dashboard" class="menu-item">
 
                 <i class="bi bi-grid"></i>
 
@@ -101,49 +101,66 @@ unset($_SESSION['error_entrega']);
 
             </a>
 
+            <!-- CLIENTES -->
 
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-    <a
-        href="index.php?ruta=productos"
-        class="menu-item"
-    >
-        <i class="bi bi-box-seam"></i>
-        <span>Productos</span>
-    </a>
+            <a href="index.php?ruta=clientes" class="menu-item">
+                
+                <i class="bi bi-person-vcard"></i>
+        
+                <span>Clientes</span>
+            </a>
 
-<?php endif; ?>
+            <?php endif; ?>
 
+            <!-- INGRESAR PAQUETE -->
 
-            <a href="index.php?ruta=zonas" class="menu-item active">
-    <i class="bi bi-geo-alt"></i>
-    <span>Zonas</span>
-</a>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
+            <a href="index.php?ruta=ingresar-paquete" class="menu-item">
+                
+                <i class="bi bi-box-arrow-in-down"></i>
+                
+                <span>Ingresar paquete</span>
+            </a>
 
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+            <?php endif; ?>
 
-    <a
-        href="index.php?ruta=inventario"
-        class="menu-item"
-    >
-        <i class="bi bi-boxes"></i>
-        <span>Inventario</span>
-    </a>
+            <!-- PRODUCTOS -->
 
-<?php endif; ?>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
+            <a href="index.php?ruta=productos" class="menu-item">
+                
+                <i class="bi bi-box-seam"></i>
+                
+                <span>Productos</span>
+            </a>
 
-            <a
-                href="index.php?ruta=pedidos"
-                class="menu-item activo"
-            >
+            <?php endif; ?>
+
+            <!-- ZONAS -->
+
+            <a href="index.php?ruta=zonas" class="menu-item">
+                <i class="bi bi-geo-alt"></i>
+                <span>Zonas</span>
+            </a>
+
+            <!-- INVENTARIO -->
+
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
+
+            <a href="index.php?ruta=inventario" class="menu-item">
+                <i class="bi bi-boxes"></i>
+                <span>Inventario</span>
+            </a>
+
+            <?php endif; ?>
+
+            <!-- PEDIDOS -->
+
+            <a href="index.php?ruta=pedidos" class="menu-item activo">
 
                 <i class="bi bi-clipboard-check"></i>
 
@@ -151,9 +168,42 @@ unset($_SESSION['error_entrega']);
 
             </a>
 
+            <!-- OPERARIOS -->
+
+            <a href="#" class="menu-item">
+
+                <i class="bi bi-people"></i>
+
+                <span>Operarios</span>
+
+            </a>
+
+            <!-- PICKING -->
+
+            <a href="index.php?ruta=picking" class="menu-item">
+
+                <i class="bi bi-signpost-2"></i>
+
+                <span>Picking</span>
+
+            </a>
+
+            <!-- REPORTES -->
+
+            <a href="#" class="menu-item">
+
+                <i class="bi bi-bar-chart"></i>
+
+                <span>Reportes</span>
+
+            </a>
+
 
         </nav>
 
+
+
+        <!-- LOGOUT -->
 
         <div class="sidebar-footer">
 

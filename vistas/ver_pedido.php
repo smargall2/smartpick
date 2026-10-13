@@ -1,7 +1,6 @@
 <?php
 
 if (!isset($_SESSION['usuario'])) {
-
     header("Location: index.php?ruta=login");
     exit;
 }
@@ -20,14 +19,6 @@ $error =
 
 unset($_SESSION['mensaje_pedido']);
 unset($_SESSION['error_pedido']);
-
-
-$estado =
-    strtolower($pedido['Estado']);
-
-
-$claseEstado =
-    'estado-pendiente';
 
 
 $estado =
@@ -61,7 +52,47 @@ if (
 
     $claseEstado =
         'estado-completado';
+
+} elseif (
+    $estado === 'almacenado'
+) {
+
+    $claseEstado =
+        'estado-almacenado';
+
+} elseif (
+    $estado === 'pendiente_retiro'
+) {
+
+    $claseEstado =
+        'estado-proceso';
 }
+
+
+$esAdministrador =
+    strtolower(
+        $_SESSION['usuario']['rol']
+    ) === 'administrador';
+
+
+$estaListo =
+    strtoupper(
+        $pedido['Estado']
+    ) === 'LISTO_PARA_VALIDAR';
+
+
+$puedeAsignarOperario =
+    $esAdministrador
+    &&
+    in_array(
+        strtolower($pedido['Estado']),
+        [
+            'pendiente',
+            'pendiente_retiro',
+            'preparando'
+        ],
+        true
+    );
 
 ?>
 
@@ -79,7 +110,7 @@ if (
     >
 
     <title>
-        Pedido #<?= $pedido['ID_pedido'] ?> | SmartPick
+        Pedido #<?= (int)$pedido['ID_pedido'] ?> | SmartPick
     </title>
 
 
@@ -114,21 +145,32 @@ if (
 <div class="dashboard">
 
 
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
+
     <aside class="sidebar">
 
+
+        <!-- LOGO -->
 
         <div class="sidebar-logo">
 
             <img
-                src="img/logoSinFondo.png"
+                src="/proyecto/smartpick/img/logoSinFondo.png"
                 alt="SmartPick"
             >
 
         </div>
 
 
+
+        <!-- NAVEGACIÓN -->
+
         <nav class="sidebar-menu">
 
+
+            <!-- DASHBOARD -->
 
             <a
                 href="index.php?ruta=dashboard"
@@ -141,74 +183,94 @@ if (
 
             </a>
 
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
 
-    <a
-        href="index.php?ruta=clientes"
-        class="menu-item"
-    >
-        <i class="bi bi-person-vcard"></i>
-        <span>Clientes</span>
-    </a>
+            <!-- CLIENTES -->
 
-<?php endif; ?>
+            <?php if ($esAdministrador): ?>
 
-<?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+                <a
+                    href="index.php?ruta=clientes"
+                    class="menu-item"
+                >
 
-    <a
-        href="index.php?ruta=ingresar-paquete"
-        class="menu-item"
-    >
-        <i class="bi bi-box-arrow-in-down"></i>
-        <span>Ingresar paquete</span>
-    </a>
+                    <i class="bi bi-person-vcard"></i>
 
-<?php endif; ?>
+                    <span>Clientes</span>
+
+                </a>
+
+            <?php endif; ?>
 
 
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+            <!-- INGRESAR PAQUETE -->
 
-    <a
-        href="index.php?ruta=productos"
-        class="menu-item"
-    >
-        <i class="bi bi-box-seam"></i>
-        <span>Productos</span>
-    </a>
+            <?php if ($esAdministrador): ?>
 
-<?php endif; ?>
+                <a
+                    href="index.php?ruta=ingresar-paquete"
+                    class="menu-item"
+                >
 
+                    <i class="bi bi-box-arrow-in-down"></i>
 
-            <a href="index.php?ruta=zonas" class="menu-item active">
-    <i class="bi bi-geo-alt"></i>
-    <span>Zonas</span>
-</a>
+                    <span>Ingresar paquete</span>
+
+                </a>
+
+            <?php endif; ?>
 
 
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
+            <!-- PRODUCTOS -->
 
-    <a
-        href="index.php?ruta=inventario"
-        class="menu-item"
-    >
-        <i class="bi bi-boxes"></i>
-        <span>Inventario</span>
-    </a>
+            <?php if ($esAdministrador): ?>
 
-<?php endif; ?>
+                <a
+                    href="index.php?ruta=productos"
+                    class="menu-item"
+                >
 
+                    <i class="bi bi-box-seam"></i>
+
+                    <span>Productos</span>
+
+                </a>
+
+            <?php endif; ?>
+
+
+            <!-- ZONAS -->
+
+            <a
+                href="index.php?ruta=zonas"
+                class="menu-item"
+            >
+
+                <i class="bi bi-geo-alt"></i>
+
+                <span>Zonas</span>
+
+            </a>
+
+
+            <!-- INVENTARIO -->
+
+            <?php if ($esAdministrador): ?>
+
+                <a
+                    href="index.php?ruta=inventario"
+                    class="menu-item"
+                >
+
+                    <i class="bi bi-boxes"></i>
+
+                    <span>Inventario</span>
+
+                </a>
+
+            <?php endif; ?>
+
+
+            <!-- PEDIDOS -->
 
             <a
                 href="index.php?ruta=pedidos"
@@ -222,8 +284,53 @@ if (
             </a>
 
 
+            <!-- OPERARIOS -->
+
+            <a
+                href="#"
+                class="menu-item"
+            >
+
+                <i class="bi bi-people"></i>
+
+                <span>Operarios</span>
+
+            </a>
+
+
+            <!-- PICKING -->
+
+            <a
+                href="index.php?ruta=picking"
+                class="menu-item"
+            >
+
+                <i class="bi bi-signpost-2"></i>
+
+                <span>Picking</span>
+
+            </a>
+
+
+            <!-- REPORTES -->
+
+            <a
+                href="#"
+                class="menu-item"
+            >
+
+                <i class="bi bi-bar-chart"></i>
+
+                <span>Reportes</span>
+
+            </a>
+
+
         </nav>
 
+
+
+        <!-- CERRAR SESIÓN -->
 
         <div class="sidebar-footer">
 
@@ -245,8 +352,14 @@ if (
 
 
 
+    <!-- ==========================================
+         CONTENIDO
+    =========================================== -->
+
     <main class="main-content">
 
+
+        <!-- TOPBAR -->
 
         <header class="topbar">
 
@@ -254,7 +367,7 @@ if (
             <div class="titulo-dashboard">
 
                 <h1>
-                    PEDIDO #<?= $pedido['ID_pedido'] ?>
+                    PEDIDO #<?= (int)$pedido['ID_pedido'] ?>
                 </h1>
 
                 <p>
@@ -292,6 +405,10 @@ if (
 
 
 
+        <!-- ==========================================
+             DETALLE
+        =========================================== -->
+
         <section class="detalle-contenido">
 
 
@@ -308,6 +425,8 @@ if (
 
 
 
+            <!-- MENSAJE DE ÉXITO -->
+
             <?php if ($mensaje): ?>
 
                 <div class="mensaje-exito">
@@ -321,6 +440,8 @@ if (
             <?php endif; ?>
 
 
+
+            <!-- MENSAJE DE ERROR -->
 
             <?php if ($error): ?>
 
@@ -336,8 +457,14 @@ if (
 
 
 
+            <!-- ======================================
+                 INFORMACIÓN GENERAL + CLIENTE
+            ======================================= -->
+
             <div class="grid-detalle">
 
+
+                <!-- INFORMACIÓN DEL PEDIDO -->
 
                 <div class="tarjeta">
 
@@ -364,61 +491,118 @@ if (
                     <div class="datos-grid">
 
 
+                        <!-- ID -->
+
                         <div class="dato">
 
-                            <span>ID PEDIDO</span>
+                            <span>
+                                ID PEDIDO
+                            </span>
 
                             <strong>
-                                #<?= $pedido['ID_pedido'] ?>
+                                #<?= (int)$pedido['ID_pedido'] ?>
                             </strong>
 
                         </div>
 
 
-                        <div class="dato">
 
-                            <span>FECHA DE INGRESO</span>
-
-                            <strong>
-
-                                <?= date(
-                                    'd/m/Y',
-                                    strtotime(
-                                        $pedido['Fecha_ingresado']
-                                    )
-                                ) ?>
-
-                            </strong>
-
-                        </div>
-
+                        <!-- FECHA INGRESO -->
 
                         <div class="dato">
 
-                            <span>ESTADO</span>
-
-                            <strong
-                                class="estado <?= $claseEstado ?>"
-                            >
-
-                                <?= htmlspecialchars(
-                                    $pedido['Estado']
-                                ) ?>
-
-                            </strong>
-
-                        </div>
-
-
-                        <div class="dato">
-
-                            <span>FECHA DE ENTREGA</span>
+                            <span>
+                                FECHA DE INGRESO
+                            </span>
 
                             <strong>
 
                                 <?php
 
-                                if ($pedido['Fecha_entregado']) {
+                                if (!empty($pedido['Fecha_ingresado'])) {
+
+                                    echo date(
+                                        'd/m/Y',
+                                        strtotime(
+                                            $pedido['Fecha_ingresado']
+                                        )
+                                    );
+
+                                } else {
+
+                                    echo '-';
+                                }
+
+                                ?>
+
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- ESTADO -->
+
+                        <div class="dato">
+
+                            <span>
+                                ESTADO
+                            </span>
+
+                            <strong
+                                class="estado <?= $claseEstado ?>"
+                            >
+
+                                <?php
+
+                                $estadoMostrar =
+                                    strtoupper(
+                                        $pedido['Estado']
+                                    );
+
+
+                                if (
+                                    $estadoMostrar ===
+                                    'LISTO_PARA_VALIDAR'
+                                ) {
+
+                                    echo 'LISTO PARA VALIDAR';
+
+                                } elseif (
+                                    $estadoMostrar ===
+                                    'PENDIENTE_RETIRO'
+                                ) {
+
+                                    echo 'PENDIENTE DE RETIRO';
+
+                                } else {
+
+                                    echo htmlspecialchars(
+                                        $pedido['Estado']
+                                    );
+                                }
+
+                                ?>
+
+                            </strong>
+
+                        </div>
+
+
+
+                        <!-- FECHA ENTREGA -->
+
+                        <div class="dato">
+
+                            <span>
+                                FECHA DE ENTREGA
+                            </span>
+
+                            <strong>
+
+                                <?php
+
+                                if (!empty($pedido['Fecha_entregado'])) {
 
                                     echo date(
                                         'd/m/Y',
@@ -446,6 +630,10 @@ if (
 
 
 
+                <!-- ======================================
+                     CLIENTE
+                ======================================= -->
+
                 <div class="tarjeta">
 
 
@@ -470,6 +658,7 @@ if (
 
                     <div class="cliente-detalle">
 
+
                         <div class="avatar-cliente">
 
                             <i class="bi bi-person"></i>
@@ -491,6 +680,7 @@ if (
                             <span>
 
                                 CI:
+
                                 <?= htmlspecialchars(
                                     $pedido['CI_cliente']
                                 ) ?>
@@ -498,7 +688,7 @@ if (
                             </span>
 
 
-                            <?php if ($pedido['Mail_cliente']): ?>
+                            <?php if (!empty($pedido['Mail_cliente'])): ?>
 
                                 <small>
 
@@ -512,6 +702,7 @@ if (
 
 
                         </div>
+
 
                     </div>
 
@@ -558,153 +749,183 @@ if (
 
                             <tr>
 
-                                <th>CÓDIGO</th>
+                                <th>
+                                    CÓDIGO
+                                </th>
 
-                                <th>PRODUCTO</th>
+                                <th>
+                                    PRODUCTO
+                                </th>
 
-                                <th>CATEGORÍA</th>
+                                <th>
+                                    CATEGORÍA
+                                </th>
 
-                                <th>CANTIDAD</th>
+                                <th>
+                                    CANTIDAD
+                                </th>
 
-                                <th>STOCK</th>
+                                <th>
+                                    STOCK
+                                </th>
 
                             </tr>
 
                         </thead>
 
 
-                       <tbody>
-
-<?php foreach ($productosPedido as $producto): ?>
-
-    <tr>
-
-        <td>
-            #<?= $producto['ID_producto'] ?>
-        </td>
-
-        <td>
-
-            <strong>
-
-                <?= htmlspecialchars(
-                    $producto['Descripcion']
-                ) ?>
-
-            </strong>
-
-        </td>
-
-        <td>
-
-            <?= htmlspecialchars(
-                $producto['Categoria']
-            ) ?>
-
-        </td>
-
-        <td>
-            <?= $producto['Cantidad'] ?>
-        </td>
-
-        <td>
-            <?= $producto['Stock_actual'] ?>
-        </td>
-
-    </tr>
-
-<?php endforeach; ?>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
+                        <tbody>
 
 
-<?php
-
-$esAdministrador =
-    strtolower(
-        $_SESSION['usuario']['rol']
-    ) === 'administrador';
+                            <?php if (!empty($productosPedido)): ?>
 
 
-$estaListo =
-    strtoupper(
-        $pedido['Estado']
-    ) === 'LISTO_PARA_VALIDAR';
+                                <?php foreach ($productosPedido as $producto): ?>
 
-?>
+                                    <tr>
 
 
-<?php if ($esAdministrador && $estaListo): ?>
+                                        <td>
+
+                                            #<?= (int)$producto['ID_producto'] ?>
+
+                                        </td>
 
 
-    <div class="validacion-pedido">
+                                        <td>
+
+                                            <strong>
+
+                                                <?= htmlspecialchars(
+                                                    $producto['Descripcion']
+                                                ) ?>
+
+                                            </strong>
+
+                                        </td>
 
 
-        <div class="validacion-info">
+                                        <td>
 
-            <i class="bi bi-shield-check"></i>
+                                            <?= htmlspecialchars(
+                                                $producto['Categoria']
+                                            ) ?>
 
-            <div>
+                                        </td>
 
-                <strong>
-                    PEDIDO LISTO PARA VALIDAR
-                </strong>
 
-                <span>
-                    Todos los productos fueron retirados
-                    durante el picking.
-                </span>
+                                        <td>
+
+                                            <?= (int)$producto['Cantidad'] ?>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <?= (int)$producto['Stock_actual'] ?>
+
+                                        </td>
+
+
+                                    </tr>
+
+                                <?php endforeach; ?>
+
+
+                            <?php else: ?>
+
+
+                                <tr>
+
+                                    <td colspan="5">
+
+                                        No hay productos registrados
+                                        para este pedido.
+
+                                    </td>
+
+                                </tr>
+
+
+                            <?php endif; ?>
+
+
+                        </tbody>
+
+
+                    </table>
+
+                </div>
+
 
             </div>
 
-        </div>
 
 
-        <form
-            action="index.php?ruta=validar-pedido"
-            method="POST"
-            onsubmit="return confirm('¿Confirmar que el pedido fue revisado y entregado?');"
-        >
+            <!-- ======================================
+                 VALIDACIÓN FINAL
+            ======================================= -->
 
-            <input
-                type="hidden"
-                name="id_pedido"
-                value="<?= (int)$pedido['ID_pedido'] ?>"
-            >
+            <?php if ($esAdministrador && $estaListo): ?>
 
 
-            <button
-                type="submit"
-                class="btn-validar-pedido"
-            >
-
-                <i class="bi bi-check-circle"></i>
-
-                VALIDAR Y FINALIZAR
-
-            </button>
+                <div class="validacion-pedido">
 
 
-        </form>
+                    <div class="validacion-info">
+
+                        <i class="bi bi-shield-check"></i>
+
+                        <div>
+
+                            <strong>
+                                PEDIDO LISTO PARA VALIDAR
+                            </strong>
+
+                            <span>
+                                Todos los productos fueron retirados
+                                durante el picking.
+                            </span>
+
+                        </div>
+
+                    </div>
 
 
-    </div>
+                    <form
+                        action="index.php?ruta=validar-pedido"
+                        method="POST"
+                        onsubmit="return confirm('¿Confirmar que el pedido fue revisado y entregado?');"
+                    >
 
 
-<?php endif; ?>
+                        <input
+                            type="hidden"
+                            name="id_pedido"
+                            value="<?= (int)$pedido['ID_pedido'] ?>"
+                        >
 
 
-<!-- ======================================
-     OPERARIO
-======================================= -->
+                        <button
+                            type="submit"
+                            class="btn-validar-pedido"
+                        >
 
-<div class="tarjeta">
+                            <i class="bi bi-check-circle"></i>
+
+                            VALIDAR Y FINALIZAR
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+            <?php endif; ?>
 
 
 
@@ -735,7 +956,10 @@ $estaListo =
 
 
 
-                <?php if ($pedido['Operario']): ?>
+                <!-- OPERARIO ACTUAL -->
+
+                <?php if (!empty($pedido['Operario'])): ?>
+
 
                     <div class="operario-actual">
 
@@ -759,23 +983,45 @@ $estaListo =
 
                     </div>
 
+
+                <?php else: ?>
+
+
+                    <div class="operario-actual">
+
+                        <i class="bi bi-person-dash"></i>
+
+                        <div>
+
+                            <span>
+                                OPERARIO ASIGNADO
+                            </span>
+
+                            <strong>
+                                Sin asignar
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
                 <?php endif; ?>
 
 
 
-                <?php
-                if (
-    in_array(
-        strtolower($pedido['Estado']),
-        [
-            'pendiente',
-            'pendiente_retiro',
-            'preparando'
-        ],
-        true
-    )
-):
-                ?>
+                <!-- ==================================
+                     FORMULARIO DE ASIGNACIÓN
+
+                     Solo lo ve el administrador.
+
+                     El administrador también puede
+                     seleccionarse como responsable
+                     del picking.
+                =================================== -->
+
+                <?php if ($puedeAsignarOperario): ?>
+
 
                     <form
                         action="index.php?ruta=asignar-operario"
@@ -787,21 +1033,29 @@ $estaListo =
                         <input
                             type="hidden"
                             name="id_pedido"
-                            value="<?= $pedido['ID_pedido'] ?>"
+                            value="<?= (int)$pedido['ID_pedido'] ?>"
                         >
 
 
                         <div class="campo-operario">
 
-                            <label>
-                                Seleccionar operario
+
+                            <label for="ci_operario">
+
+                                <?= !empty($pedido['Operario'])
+                                    ? 'Reasignar operario'
+                                    : 'Seleccionar operario'
+                                ?>
+
                             </label>
 
 
                             <select
+                                id="ci_operario"
                                 name="ci_operario"
                                 required
                             >
+
 
                                 <option value="">
                                     Seleccione un operario
@@ -810,24 +1064,51 @@ $estaListo =
 
                                 <?php foreach ($operarios as $operario): ?>
 
+
                                     <option
                                         value="<?= htmlspecialchars(
                                             $operario['CI_operario']
                                         ) ?>"
+                                        <?= (
+                                            !empty($pedido['CI_operario'])
+                                            &&
+                                            $pedido['CI_operario']
+                                            ===
+                                            $operario['CI_operario']
+                                        )
+                                            ? 'selected'
+                                            : ''
+                                        ?>
                                     >
 
                                         <?= htmlspecialchars(
                                             $operario['Nombre_completo']
                                         ) ?>
 
+                                        <?php if (
+                                            strtolower($operario['Rol'])
+                                            === 'administrador'
+                                        ): ?>
+
+                                            (Administrador)
+
+                                        <?php else: ?>
+
+                                            (Operario)
+
+                                        <?php endif; ?>
+
                                     </option>
+
 
                                 <?php endforeach; ?>
 
 
                             </select>
 
+
                         </div>
+
 
 
                         <button
@@ -837,7 +1118,7 @@ $estaListo =
 
                             <i class="bi bi-person-check"></i>
 
-                            <?= $pedido['Operario']
+                            <?= !empty($pedido['Operario'])
                                 ? 'REASIGNAR'
                                 : 'ASIGNAR OPERARIO'
                             ?>
@@ -846,6 +1127,7 @@ $estaListo =
 
 
                     </form>
+
 
                 <?php endif; ?>
 

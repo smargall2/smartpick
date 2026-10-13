@@ -328,18 +328,79 @@ case 'nuevo-cliente':
 
     break;
 
-    // ---------------------------------
-    // PEDIDOS
-    // ---------------------------------
-
     case 'pedidos':
 
-    // Traer pedidos desde la base
+    if (!isset($_SESSION['usuario'])) {
+
+        header(
+            "Location: index.php?ruta=login"
+        );
+
+        exit;
+    }
+
+
     $pedidos =
-        $pedidoRepositorio->obtenerTodos();
+        $pedidoRepositorio
+            ->obtenerTodos();
 
 
-    require_once __DIR__ . '/vistas/pedidos.php';
+    $pedidoDestacado =
+        (int)(
+            $_GET['destacar']
+            ?? $_SESSION['pedido_destacado']
+            ?? 0
+        );
+
+
+    unset(
+        $_SESSION['pedido_destacado']
+    );
+
+
+    // Si hay un pedido destacado,
+    // lo movemos temporalmente al principio.
+
+    if ($pedidoDestacado > 0) {
+
+        usort(
+            $pedidos,
+
+            function (
+                $a,
+                $b
+            ) use ($pedidoDestacado) {
+
+                $idA =
+                    (int)$a['ID_pedido'];
+
+                $idB =
+                    (int)$b['ID_pedido'];
+
+
+                if (
+                    $idA === $pedidoDestacado
+                ) {
+                    return -1;
+                }
+
+
+                if (
+                    $idB === $pedidoDestacado
+                ) {
+                    return 1;
+                }
+
+
+                return 0;
+            }
+        );
+    }
+
+
+    require_once
+        __DIR__
+        . '/vistas/pedidos.php';
 
     break;
 
@@ -657,63 +718,241 @@ case 'nuevo-cliente':
 
     break;
 
+    
+
+    // ---------------------------------
+    // EDITAR PEDIDO
+    // ---------------------------------
+
+    case 'editar-pedido':
+
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?ruta=login");
+            exit;
+        }
+
+        if (
+            strtolower($_SESSION['usuario']['rol'])
+            !== 'administrador'
+        ) {
+            http_response_code(403);
+            echo "No tiene permisos para modificar pedidos.";
+            exit;
+        }
+
+        $idPedido = (int)($_GET['id'] ?? 0);
+
+        if ($idPedido <= 0) {
+            header("Location: index.php?ruta=pedidos");
+            exit;
+        }
+
+        $pedido =
+            $pedidoRepositorio
+                ->obtenerDetalle($idPedido);
+
+        if (!$pedido) {
+            $_SESSION['error_pedido'] =
+                "El pedido no existe.";
+
+            header("Location: index.php?ruta=pedidos");
+            exit;
+        }
+
+        if (
+            strtoupper($pedido['Estado'])
+            !== 'PENDIENTE'
+        ) {
+            $_SESSION['error_pedido'] =
+                "Solo se pueden modificar pedidos pendientes.";
+
+            header(
+                "Location: index.php?ruta=ver-pedido&id="
+                . $idPedido
+            );
+            exit;
+        }
+
+        $productosPedido =
+            $pedidoRepositorio
+                ->obtenerProductosPedido($idPedido);
+
+        $paquetesCliente =
+            $pedidoRepositorio
+                ->obtenerPaquetesCliente(
+                    $pedido['CI_cliente']
+                );
+
+        require_once
+            __DIR__ . '/vistas/editar_pedido.php';
+
+        break;
+
+
+    // ---------------------------------
+    // GUARDAR EDICIÓN DE PEDIDO
+    // ---------------------------------
+
+    case 'guardar-edicion-pedido':
+
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?ruta=login");
+            exit;
+        }
+
+        if (
+            strtolower($_SESSION['usuario']['rol'])
+            !== 'administrador'
+        ) {
+            http_response_code(403);
+            echo "No tiene permisos para modificar pedidos.";
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: index.php?ruta=pedidos");
+            exit;
+        }
+
+        $idPedido =
+            (int)($_POST['id_pedido'] ?? 0);
+
+        if ($idPedido <= 0) {
+            $_SESSION['error_pedido'] =
+                "Pedido inválido.";
+
+            header("Location: index.php?ruta=pedidos");
+            exit;
+        }
+
+        $idsProductos =
+            $_POST['producto_id'] ?? [];
+
+        $cantidades =
+            $_POST['cantidad'] ?? [];
+
+        $productosPedido = [];
+
+        foreach ($idsProductos as $indice => $idProducto) {
+
+            $idProducto = (int)$idProducto;
+            $cantidad =
+                (int)($cantidades[$indice] ?? 0);
+
+            if (
+                $idProducto > 0 &&
+                $cantidad > 0
+            ) {
+                $productosPedido[] = [
+                    'id_producto' => $idProducto,
+                    'cantidad' => $cantidad
+                ];
+            }
+        }
+
+        $paquetesSeleccionados =
+            $_POST['paquetes'] ?? [];
+
+        try {
+
+            $pedidoRepositorio
+                ->modificarEntregaPendiente(
+                    $idPedido,
+                    $productosPedido,
+                    $paquetesSeleccionados
+                );
+
+            $_SESSION['mensaje_pedido'] =
+                "Pedido #"
+                . $idPedido
+                . " modificado correctamente.";
+
+            $_SESSION['pedido_destacado'] =
+                $idPedido;
+
+            header(
+                "Location: index.php?ruta=ver-pedido&id="
+                . $idPedido
+            );
+            exit;
+
+        } catch (Exception $e) {
+
+            $_SESSION['error_editar_pedido'] =
+                $e->getMessage();
+
+            header(
+                "Location: index.php?ruta=editar-pedido&id="
+                . $idPedido
+            );
+            exit;
+        }
+
+        break;
+
+
+    // ---------------------------------
+    // VER PEDIDO
+    // ---------------------------------
+
     case 'ver-pedido':
 
-    if (!isset($_SESSION['usuario'])) {
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?ruta=login");
+            exit;
+        }
 
-        header("Location: index.php?ruta=login");
-        exit;
-    }
+        $idPedido =
+            (int)($_GET['id'] ?? 0);
 
+        if ($idPedido <= 0) {
+            header("Location: index.php?ruta=pedidos");
+            exit;
+        }
 
-    $idPedido =
-        (int)($_GET['id'] ?? 0);
+        $pedido =
+            $pedidoRepositorio
+                ->obtenerDetalle($idPedido);
 
+        if (!$pedido) {
+            http_response_code(404);
+            echo "Pedido no encontrado.";
+            exit;
+        }
 
-    if ($idPedido <= 0) {
+        $productosPedido =
+            $pedidoRepositorio
+                ->obtenerProductosPedido($idPedido);
 
-        header("Location: index.php?ruta=pedidos");
-        exit;
-    }
+        $operarios =
+            $operarioRepositorio
+                ->obtenerOperarios();
 
+        require_once
+            __DIR__ . '/vistas/ver_pedido.php';
 
-    $pedido =
-        $pedidoRepositorio
-            ->obtenerDetalle($idPedido);
+        break;
 
-
-    if (!$pedido) {
-
-        http_response_code(404);
-
-        echo "Pedido no encontrado.";
-
-        exit;
-    }
-
-
-    $productosPedido =
-        $pedidoRepositorio
-            ->obtenerProductosPedido(
-                $idPedido
-            );
-
-
-    $operarios =
-        $operarioRepositorio
-            ->obtenerOperarios();
-
-
-    require_once
-        __DIR__ . '/vistas/ver_pedido.php';
-
-    break;
 
     case 'asignar-operario':
 
     if (!isset($_SESSION['usuario'])) {
 
         header("Location: index.php?ruta=login");
+        exit;
+    }
+
+
+    // SOLO ADMINISTRADOR PUEDE ASIGNAR O REASIGNAR
+
+    if (
+        strtolower($_SESSION['usuario']['rol'])
+        !== 'administrador'
+    ) {
+
+        http_response_code(403);
+
+        echo "No tiene permisos para asignar operarios.";
         exit;
     }
 
@@ -749,6 +988,9 @@ case 'nuevo-cliente':
         exit;
     }
 
+
+    // Puede ser un Operario o un Administrador.
+    // Ambos pueden realizar tareas de picking.
 
     $operario =
         $operarioRepositorio
@@ -795,6 +1037,7 @@ case 'nuevo-cliente':
     );
 
     exit;
+
 
     // ---------------------------------
     // PICKING

@@ -4,6 +4,7 @@ class DashboardRepositorio
 {
     private $conexion;
 
+
     public function __construct($conexion)
     {
         $this->conexion = $conexion;
@@ -21,12 +22,21 @@ class DashboardRepositorio
             FROM producto
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute();
+        $resultado = mysqli_query(
+            $this->conexion,
+            $sql
+        );
 
-        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$resultado) {
+            die(
+                'Error al obtener stock total: ' .
+                mysqli_error($this->conexion)
+            );
+        }
 
-        return $resultado['total'];
+        $fila = mysqli_fetch_assoc($resultado);
+
+        return $fila['total'];
     }
 
 
@@ -42,12 +52,21 @@ class DashboardRepositorio
             WHERE LOWER(Estado) = 'pendiente'
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute();
+        $resultado = mysqli_query(
+            $this->conexion,
+            $sql
+        );
 
-        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$resultado) {
+            die(
+                'Error al obtener pedidos pendientes: ' .
+                mysqli_error($this->conexion)
+            );
+        }
 
-        return $resultado['total'];
+        $fila = mysqli_fetch_assoc($resultado);
+
+        return $fila['total'];
     }
 
 
@@ -63,12 +82,21 @@ class DashboardRepositorio
             WHERE LOWER(Rol) = 'operario'
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute();
+        $resultado = mysqli_query(
+            $this->conexion,
+            $sql
+        );
 
-        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$resultado) {
+            die(
+                'Error al obtener cantidad de operarios: ' .
+                mysqli_error($this->conexion)
+            );
+        }
 
-        return $resultado['total'];
+        $fila = mysqli_fetch_assoc($resultado);
+
+        return $fila['total'];
     }
 
 
@@ -77,21 +105,30 @@ class DashboardRepositorio
     // ==========================================
 
     public function obtenerStockBajo()
-{
-    $sql = "
-        SELECT COUNT(*) AS total
-        FROM Producto
-        WHERE UPPER(Tipo) = 'ALMACEN'
-          AND Stock_actual <= Stock_minimo
-    ";
+    {
+        $sql = "
+            SELECT COUNT(*) AS total
+            FROM producto
+            WHERE UPPER(Tipo) = 'ALMACEN'
+              AND Stock_actual <= Stock_minimo
+        ";
 
-    $stmt = $this->conexion->prepare($sql);
-    $stmt->execute();
+        $resultado = mysqli_query(
+            $this->conexion,
+            $sql
+        );
 
-    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$resultado) {
+            die(
+                'Error al obtener stock bajo: ' .
+                mysqli_error($this->conexion)
+            );
+        }
 
-    return (int)($resultado['total'] ?? 0);
-}
+        $fila = mysqli_fetch_assoc($resultado);
+
+        return (int)($fila['total'] ?? 0);
+    }
 
 
     // ==========================================
@@ -110,9 +147,21 @@ class DashboardRepositorio
             LIMIT 5
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute();
+        $resultado = mysqli_query(
+            $this->conexion,
+            $sql
+        );
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!$resultado) {
+            die(
+                'Error al obtener pedidos recientes: ' .
+                mysqli_error($this->conexion)
+            );
+        }
+
+        return mysqli_fetch_all(
+            $resultado,
+            MYSQLI_ASSOC
+        );
     }
 }

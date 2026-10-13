@@ -54,100 +54,140 @@ unset($_SESSION['error_producto']);
 
 <div class="dashboard">
 
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
+
     <aside class="sidebar">
+
+
+        <!-- LOGO -->
 
         <div class="sidebar-logo">
 
-            <img
-                src="img/logoSinFondo.png"
-                alt="SmartPick"
-            >
+            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
 
+
+        <!-- NAVEGACIÓN -->
+
         <nav class="sidebar-menu">
 
-            <a
-                href="index.php?ruta=dashboard"
-                class="menu-item"
-            >
+        <!-- DASHBOARD -->
+
+            <a href="index.php?ruta=dashboard" class="menu-item">
+
                 <i class="bi bi-grid"></i>
+
                 <span>Dashboard</span>
+
             </a>
 
+            <!-- CLIENTES -->
 
-            <a
-                href="index.php?ruta=productos"
-                class="menu-item activo"
-            >
-                <i class="bi bi-box-seam"></i>
-                <span>Productos</span>
-            </a>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-
-            <a href="index.php?ruta=zonas" class="menu-item active">
-    <i class="bi bi-geo-alt"></i>
-    <span>Zonas</span>
-</a>
-
-
-            <?php if (
-    strtolower($_SESSION['usuario']['rol'])
-    === 'administrador'
-): ?>
-
-    <a
-        href="index.php?ruta=inventario"
-        class="menu-item"
-    >
-        <i class="bi bi-boxes"></i>
-        <span>Inventario</span>
-    </a>
-
-<?php endif; ?>
-
-
-            <a
-                href="index.php?ruta=clientes"
-                class="menu-item"
-            >
+            <a href="index.php?ruta=clientes" class="menu-item">
+                
                 <i class="bi bi-person-vcard"></i>
+        
                 <span>Clientes</span>
             </a>
 
+            <?php endif; ?>
 
-            <a
-                href="index.php?ruta=pedidos"
-                class="menu-item"
-            >
+            <!-- INGRESAR PAQUETE -->
+
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
+
+            <a href="index.php?ruta=ingresar-paquete" class="menu-item">
+                
+                <i class="bi bi-box-arrow-in-down"></i>
+                
+                <span>Ingresar paquete</span>
+            </a>
+
+            <?php endif; ?>
+
+            <!-- PRODUCTOS -->
+
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
+
+            <a href="index.php?ruta=productos" class="menu-item activo">
+                
+                <i class="bi bi-box-seam"></i>
+                
+                <span>Productos</span>
+            </a>
+
+            <?php endif; ?>
+
+            <!-- ZONAS -->
+
+            <a href="index.php?ruta=zonas" class="menu-item">
+                <i class="bi bi-geo-alt"></i>
+                <span>Zonas</span>
+            </a>
+
+            <!-- INVENTARIO -->
+
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
+
+            <a href="index.php?ruta=inventario" class="menu-item">
+                <i class="bi bi-boxes"></i>
+                <span>Inventario</span>
+            </a>
+
+            <?php endif; ?>
+
+            <!-- PEDIDOS -->
+
+            <a href="index.php?ruta=pedidos" class="menu-item">
+
                 <i class="bi bi-clipboard-check"></i>
+
                 <span>Pedidos</span>
+
             </a>
 
+            <!-- OPERARIOS -->
 
             <a href="#" class="menu-item">
+
                 <i class="bi bi-people"></i>
+
                 <span>Operarios</span>
+
             </a>
 
+            <!-- PICKING -->
 
-            <a
-                href="index.php?ruta=picking"
-                class="menu-item"
-            >
+            <a href="index.php?ruta=picking" class="menu-item">
+
                 <i class="bi bi-signpost-2"></i>
+
                 <span>Picking</span>
+
             </a>
 
+            <!-- REPORTES -->
 
             <a href="#" class="menu-item">
+
                 <i class="bi bi-bar-chart"></i>
+
                 <span>Reportes</span>
+
             </a>
+
 
         </nav>
 
+
+
+        <!-- LOGOUT -->
 
         <div class="sidebar-footer">
 
@@ -155,11 +195,15 @@ unset($_SESSION['error_producto']);
                 href="index.php?ruta=logout"
                 class="menu-item cerrar-sesion"
             >
+
                 <i class="bi bi-box-arrow-left"></i>
+
                 <span>Cerrar sesión</span>
+
             </a>
 
         </div>
+
 
     </aside>
 

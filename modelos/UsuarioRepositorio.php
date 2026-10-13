@@ -7,10 +7,12 @@ class UsuarioRepositorio
 {
     private $conexion;
 
+
     public function __construct($conexion)
     {
         $this->conexion = $conexion;
     }
+
 
     public function buscarPorCI($ci)
     {
@@ -21,24 +23,57 @@ class UsuarioRepositorio
                 p.Mail,
                 p.Contrasena,
                 o.Rol
+
             FROM persona p
+
             INNER JOIN operario o
                 ON p.CI = o.CI_operario
-            WHERE p.CI = :ci
+
+            WHERE p.CI = ?
+
             LIMIT 1
         ";
 
-        $stmt = $this->conexion->prepare($sql);
 
-        $stmt->bindParam(':ci', $ci);
+        $stmt = mysqli_prepare(
+            $this->conexion,
+            $sql
+        );
 
-        $stmt->execute();
 
-        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$stmt) {
+            die(
+                'Error al preparar la consulta: ' .
+                mysqli_error($this->conexion)
+            );
+        }
+
+
+        mysqli_stmt_bind_param(
+            $stmt,
+            "s",
+            $ci
+        );
+
+
+        mysqli_stmt_execute($stmt);
+
+
+        $resultado =
+            mysqli_stmt_get_result($stmt);
+
+
+        $fila =
+            mysqli_fetch_assoc($resultado);
+
+
+        mysqli_stmt_close($stmt);
+
 
         if (!$fila) {
             return null;
         }
+
 
         return new Usuario(
             $fila['CI'],
