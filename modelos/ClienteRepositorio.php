@@ -404,4 +404,49 @@ class ClienteRepositorio
             throw $e;
         }
     }
+    public function modificar($ci, $nombre, $telefono, $mail, $direccion)
+    {
+        if (trim($ci) === '' || trim($nombre) === '') throw new Exception('La CI y el nombre son obligatorios.');
+        if ($mail !== '' && !filter_var($mail, FILTER_VALIDATE_EMAIL)) throw new Exception('Correo inválido.');
+        $sql = "UPDATE persona p INNER JOIN cliente c ON c.CI_cliente=p.CI SET p.Nombre_completo=?, p.Telefono=NULLIF(?, ''), p.Mail=NULLIF(?, ''), p.Direccion=NULLIF(?, '') WHERE p.CI=?";
+        $stmt = mysqli_prepare($this->conexion, $sql);
+        if (!$stmt) throw new Exception(mysqli_error($this->conexion));
+        mysqli_stmt_bind_param($stmt, 'sssss', $nombre, $telefono, $mail, $direccion, $ci);
+        if (!mysqli_stmt_execute($stmt)) { $error=mysqli_stmt_error($stmt); mysqli_stmt_close($stmt); throw new Exception($error); }
+        mysqli_stmt_close($stmt);
+    }
+
+    public function eliminar($ci)
+    {
+        mysqli_begin_transaction($this->conexion);
+        try {
+            $stmt=mysqli_prepare($this->conexion, 'SELECT CI_cliente FROM cliente WHERE CI_cliente=? FOR UPDATE');
+            if (!$stmt) throw new Exception(mysqli_error($this->conexion));
+            mysqli_stmt_bind_param($stmt,'s',$ci); mysqli_stmt_execute($stmt);
+            $existe=mysqli_fetch_assoc(mysqli_stmt_get_result($stmt)); mysqli_stmt_close($stmt);
+            if (!$existe) throw new Exception('Cliente no encontrado.');
+            $stmt=mysqli_prepare($this->conexion,'SELECT COUNT(*) AS total FROM recibe_entrega WHERE CI_cliente=?');
+            if (!$stmt) throw new Exception(mysqli_error($this->conexion));
+            mysqli_stmt_bind_param($stmt,'s',$ci); mysqli_stmt_execute($stmt);
+            $total=(int)mysqli_fetch_assoc(mysqli_stmt_get_result($stmt))['total']; mysqli_stmt_close($stmt);
+            if ($total>0) throw new Exception('No se puede eliminar: el cliente tiene pedidos asociados.');
+            $stmt=mysqli_prepare($this->conexion,'SELECT COUNT(*) AS total FROM operario WHERE CI_operario=?');
+            if (!$stmt) throw new Exception(mysqli_error($this->conexion));
+            mysqli_stmt_bind_param($stmt,'s',$ci); mysqli_stmt_execute($stmt);
+            $esOperario=(int)mysqli_fetch_assoc(mysqli_stmt_get_result($stmt))['total']>0; mysqli_stmt_close($stmt);
+            $stmt=mysqli_prepare($this->conexion,'DELETE FROM cliente WHERE CI_cliente=?');
+            if (!$stmt) throw new Exception(mysqli_error($this->conexion));
+            mysqli_stmt_bind_param($stmt,'s',$ci);
+            if (!mysqli_stmt_execute($stmt)) { $e=mysqli_stmt_error($stmt); mysqli_stmt_close($stmt); throw new Exception($e); }
+            mysqli_stmt_close($stmt);
+            if (!$esOperario) {
+                $stmt=mysqli_prepare($this->conexion,'DELETE FROM persona WHERE CI=?');
+                if (!$stmt) throw new Exception(mysqli_error($this->conexion));
+                mysqli_stmt_bind_param($stmt,'s',$ci);
+                if (!mysqli_stmt_execute($stmt)) { $e=mysqli_stmt_error($stmt); mysqli_stmt_close($stmt); throw new Exception($e); }
+                mysqli_stmt_close($stmt);
+            }
+            mysqli_commit($this->conexion);
+        } catch (Throwable $e) { mysqli_rollback($this->conexion); throw $e; }
+    }
 }

@@ -99,8 +99,11 @@ switch ($ruta) {
             // Validar usuario y contraseña
             if (
                 $usuario !== null &&
-                $usuario->contrasena === $contrasena
+                $usuarioRepositorio->validarContrasena($usuario, $contrasena)
             ) {
+
+                // Renovar el identificador de sesión tras autenticar.
+                session_regenerate_id(true);
 
                 // Guardar datos en sesión
                 $_SESSION['usuario'] = [
@@ -181,6 +184,49 @@ switch ($ruta) {
     break;
 
     // ---------------------------------
+    // GESTIÓN DE OPERARIOS (ADMINISTRADOR)
+    // ---------------------------------
+    case 'operarios':
+        if (!isset($_SESSION['usuario'])) { header('Location: index.php?ruta=login'); exit; }
+        if (strtolower($_SESSION['usuario']['rol']) !== 'administrador') { http_response_code(403); exit('Acceso denegado.'); }
+        $operarios = $operarioRepositorio->obtenerOperarios();
+        require __DIR__ . '/vistas/operarios.php';
+        break;
+
+    case 'guardar-operario':
+        if (!isset($_SESSION['usuario'])) { header('Location: index.php?ruta=login'); exit; }
+        if (strtolower($_SESSION['usuario']['rol']) !== 'administrador') { http_response_code(403); exit('Acceso denegado.'); }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: index.php?ruta=operarios'); exit; }
+        try {
+            $accion = $_POST['accion'] ?? '';
+            $ci = trim($_POST['ci'] ?? '');
+            if ($accion === 'crear') {
+                $operarioRepositorio->crear($_POST);
+                $_SESSION['mensaje_operarios'] = 'Operario agregado correctamente.';
+            } elseif ($accion === 'modificar') {
+                if ($ci === $_SESSION['usuario']['ci'] && strtolower(trim($_POST['rol'] ?? '')) !== 'administrador') throw new Exception('No podés quitarte tu propio rol de administrador.');
+                $operarioRepositorio->modificar($ci, $_POST);
+                if ($ci === $_SESSION['usuario']['ci']) { $_SESSION['usuario']['nombre'] = trim($_POST['nombre']); }
+                $_SESSION['mensaje_operarios'] = 'Operario actualizado correctamente.';
+            } else { throw new Exception('Acción no válida.'); }
+        } catch (Throwable $e) { $_SESSION['error_operarios'] = $e->getMessage(); }
+        header('Location: index.php?ruta=operarios');
+        exit;
+
+    case 'eliminar-operario':
+        if (!isset($_SESSION['usuario'])) { header('Location: index.php?ruta=login'); exit; }
+        if (strtolower($_SESSION['usuario']['rol']) !== 'administrador') { http_response_code(403); exit('Acceso denegado.'); }
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { header('Location: index.php?ruta=operarios'); exit; }
+        try {
+            $ci = trim($_POST['ci'] ?? '');
+            if ($ci === '' || $ci === $_SESSION['usuario']['ci']) throw new Exception('No podés eliminar tu propia cuenta.');
+            $operarioRepositorio->eliminar($ci);
+            $_SESSION['mensaje_operarios'] = 'Operario eliminado correctamente.';
+        } catch (Throwable $e) { $_SESSION['error_operarios'] = $e->getMessage(); }
+        header('Location: index.php?ruta=operarios');
+        exit;
+
+    // ---------------------------------
 // CLIENTES
 // ---------------------------------
 
@@ -217,6 +263,32 @@ case 'clientes':
 // ---------------------------------
 // NUEVO CLIENTE
 // ---------------------------------
+
+case 'editar-cliente':
+    if (!isset($_SESSION['usuario']) || strtolower($_SESSION['usuario']['rol']) !== 'administrador') { http_response_code(403); exit('Acceso denegado'); }
+    $ci=trim($_GET['ci'] ?? '');
+    $clienteEditar=$clienteRepositorio->buscarPorCI($ci);
+    if (!$clienteEditar) { http_response_code(404); exit('Cliente no encontrado.'); }
+    require __DIR__.'/vistas/editar_cliente.php';
+    break;
+
+case 'guardar-edicion-cliente':
+    if (!isset($_SESSION['usuario']) || strtolower($_SESSION['usuario']['rol']) !== 'administrador') { http_response_code(403); exit('Acceso denegado'); }
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit; }
+    try {
+        $clienteRepositorio->modificar(trim($_POST['ci']??''),trim($_POST['nombre']??''),trim($_POST['telefono']??''),trim($_POST['mail']??''),trim($_POST['direccion']??''));
+        $_SESSION['mensaje_cliente']='Cliente actualizado correctamente.';
+    } catch (Throwable $e) { $_SESSION['error_cliente']=$e->getMessage(); }
+    header('Location: index.php?ruta=clientes'); exit;
+
+case 'eliminar-cliente':
+    if (!isset($_SESSION['usuario']) || strtolower($_SESSION['usuario']['rol']) !== 'administrador') { http_response_code(403); exit('Acceso denegado'); }
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit; }
+    try {
+        $clienteRepositorio->eliminar(trim($_POST['ci']??''));
+        $_SESSION['mensaje_cliente']='Cliente eliminado correctamente.';
+    } catch (Throwable $e) { $_SESSION['error_cliente']=$e->getMessage(); }
+    header('Location: index.php?ruta=clientes'); exit;
 
 case 'nuevo-cliente':
 

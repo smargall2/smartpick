@@ -156,7 +156,7 @@
 
             <!-- OPERARIOS -->
 
-            <a href="#" class="menu-item">
+            <a href="index.php?ruta=operarios" class="menu-item">
 
                 <i class="bi bi-people"></i>
 
@@ -348,6 +348,7 @@
                                 <th>TELÉFONO</th>
                                 <th>CORREO</th>
                                 <th>DIRECCIÓN</th>
+                                <th>ACCIONES</th>
 
                             </tr>
 
@@ -419,7 +420,13 @@
                                         ) ?>
 
                                     </td>
-
+                                    <td>
+                                        <a href="index.php?ruta=editar-cliente&ci=<?= urlencode($cliente['CI_cliente']) ?>" title="Editar cliente" style="margin-right:12px;color:#205b9d"><i class="bi bi-pencil-square"></i></a>
+                                        <form method="post" action="index.php?ruta=eliminar-cliente" style="display:inline" onsubmit="return confirm('¿Eliminar este cliente? Si tiene pedidos asociados no será posible.');">
+                                            <input type="hidden" name="ci" value="<?= htmlspecialchars($cliente['CI_cliente'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <button type="submit" title="Eliminar cliente" style="background:none;border:0;cursor:pointer;color:#b42318"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
                                 </tr>
 
                             <?php endforeach; ?>
@@ -430,7 +437,7 @@
                             <tr>
 
                                 <td
-                                    colspan="5"
+                                    colspan="6"
                                     class="tabla-vacia"
                                 >
 

@@ -153,13 +153,15 @@ $usuario = $_SESSION['usuario'];
 
             <!-- OPERARIOS -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=operarios" class="menu-item">
 
                 <i class="bi bi-people"></i>
 
                 <span>Operarios</span>
 
             </a>
+            <?php endif; ?>
 
             <!-- PICKING -->
 
@@ -254,8 +256,6 @@ $usuario = $_SESSION['usuario'];
 
                 </div>
 
-
-                <i class="bi bi-chevron-down"></i>
 
 
             </div>
@@ -435,7 +435,7 @@ $usuario = $_SESSION['usuario'];
                     </div>
 
 
-                    <a href="#">
+                    <a href="index.php?ruta=pedidos">
                         Ver todos
                     </a>
 
@@ -519,7 +519,7 @@ $usuario = $_SESSION['usuario'];
                                 <td>
 
                                     <a
-                                        href="#"
+                                        href="index.php?ruta=ver-pedido&id=<?= (int)$pedido['ID_pedido'] ?>"
                                         class="btn-ver"
                                     >
 
@@ -650,7 +650,7 @@ $usuario = $_SESSION['usuario'];
 
 
 
-                    <a href="#" class="accion">
+                    <a href="index.php?ruta=operarios" class="accion">
 
                         <i class="bi bi-person-plus"></i>
 

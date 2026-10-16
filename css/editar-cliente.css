@@ -1,0 +1,35 @@
+/* SmartPick | Edición de clientes */
+:root{--azul:#205b9d;--azul-oscuro:#102f4f;--turquesa:#5aadb1;--fondo:#f4f3f6;--texto:#253548;--borde:#dce4ed}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);font-family:'Montserrat',Arial,sans-serif;color:var(--texto)}
+.editar-pagina{min-height:100vh;padding:clamp(22px,5vw,65px) 20px;display:flex;justify-content:center;align-items:flex-start}
+.editar{width:100%;max-width:760px;background:#fff;border:1px solid #e6ebf1;border-radius:18px;box-shadow:0 12px 35px rgba(16,47,79,.09);overflow:hidden}
+.editar-encabezado{padding:30px 36px;background:linear-gradient(115deg,#102f4f,#205b9d);color:#fff}
+.editar-etiqueta{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#b8e4e7}
+.editar h1{margin:12px 0 5px;font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(34px,5vw,46px);font-weight:400;letter-spacing:1px;line-height:1.1;color:#fff}
+.editar-encabezado p{margin:0;color:#dce8f4;font-size:13px;line-height:1.65}
+.editar-formulario{padding:32px 36px 36px}
+.editar-campos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:21px}
+.editar-campo{display:flex;flex-direction:column;gap:8px;min-width:0}
+.editar-campo.ancho-completo{grid-column:1/-1}
+.editar-campo label{font-size:12px;font-weight:700;color:var(--azul-oscuro);letter-spacing:.15px}
+.editar-campo input{width:100%;min-height:46px;padding:12px 14px;background:#fff;border:1px solid var(--borde);border-radius:9px;color:var(--texto);font:500 13px 'Montserrat',Arial,sans-serif;outline:none;transition:border-color .2s,box-shadow .2s,background .2s}
+.editar-campo input:focus{border-color:var(--turquesa);box-shadow:0 0 0 4px rgba(90,173,177,.16)}
+.editar-campo input[readonly]{background:#f0f3f7;color:#748396;cursor:not-allowed}
+.editar-ayuda{font-size:11px;color:#718195;line-height:1.5}
+.editar-acciones{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:flex-end;margin-top:32px;padding-top:24px;border-top:1px solid #edf0f4}
+.editar-boton{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:12px 21px;border-radius:9px;font:700 12px 'Montserrat',Arial,sans-serif;letter-spacing:.3px;text-decoration:none;transition:background .2s,transform .2s,box-shadow .2s;cursor:pointer}
+.editar-boton:hover{transform:translateY(-1px)}
+.editar-boton-principal{background:var(--azul);color:#fff;border:1px solid var(--azul)}
+.editar-boton-principal:hover{background:#164b87;box-shadow:0 5px 15px rgba(32,91,157,.2)}
+.editar-boton-secundario{background:#fff;color:var(--azul-oscuro);border:1px solid var(--borde)}
+.editar-boton-secundario:hover{background:#f3f7fb}
+.editar-volver{display:inline-flex;gap:8px;align-items:center;margin-bottom:18px;color:var(--azul);font-size:12px;font-weight:700;text-decoration:none}
+.editar-volver:hover{text-decoration:underline}
+@media(max-width:600px){.editar-pagina{padding:22px 12px}.editar-encabezado{padding:25px 22px}.editar-formulario{padding:24px 20px}.editar-campos{grid-template-columns:1fr;gap:18px}.editar-campo.ancho-completo{grid-column:auto}.editar-acciones{flex-direction:column-reverse}.editar-boton{width:100%}}
+
+/* Integración con el dashboard y sidebar de SmartPick */
+.main-content .editar-pagina{min-height:0;padding:28px 26px 48px;display:flex;justify-content:center;align-items:flex-start}
+.main-content .editar-pagina>div{width:100%;max-width:840px!important}
+.main-content .editar{max-width:none}
+@media(max-width:600px){.main-content .editar-pagina{padding:18px 12px 32px}}
