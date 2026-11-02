@@ -52,6 +52,16 @@ $primerItem = $hojaPicking[0];
         href="css/picking.css"
     >
 
+<style>
+.foto-producto-picking { display:flex; align-items:center; gap:14px; }
+.foto-producto-picking .foto-miniatura { width:72px; height:72px; object-fit:contain; border-radius:10px; background:#f3f6f9; border:1px solid #e0e6ec; padding:4px; cursor:zoom-in; flex-shrink:0; }
+.foto-producto-picking .foto-placeholder { width:72px; height:72px; border-radius:10px; background:#edf4fa; display:flex; align-items:center; justify-content:center; color:#245b98; flex-shrink:0; font-size:25px; }
+.foto-producto-picking .datos-producto { min-width:0; display:flex; flex-direction:column; gap:5px; }
+.modal-foto-picking { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; padding:24px; }
+.modal-foto-picking.abierto { display:flex; }
+.modal-foto-picking img { max-width:min(90vw,850px); max-height:85vh; object-fit:contain; background:white; border-radius:12px; }
+.modal-foto-picking .cerrar-foto { position:absolute; right:24px; top:16px; background:transparent; border:0; color:white; font-size:34px; cursor:pointer; }
+</style>
 </head>
 
 <body>
@@ -71,7 +81,7 @@ $primerItem = $hojaPicking[0];
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -406,38 +416,30 @@ $primerItem = $hojaPicking[0];
                         <!-- PRODUCTO -->
 
                         <div class="producto-picking">
-
-
-                            <span>
-                                PRODUCTO
-                            </span>
-
-
-                            <strong>
-
-                                <?= htmlspecialchars(
-                                    $item['Descripcion']
-                                ) ?>
-
-                            </strong>
-
-
-                            <small>
-
-                                Código:
-                                #<?= (int)$item['ID_producto'] ?>
-
-                                ·
-
-                                <?= htmlspecialchars(
-                                    $item['Categoria'] ?? ''
-                                ) ?>
-
-                            </small>
-
-
+                            <?php
+                                $rutaImagen = trim((string)($item['imagen'] ?? ''));
+                                $imagenValida = $rutaImagen !== ''
+                                    && preg_match('~^uploads/productos/[a-zA-Z0-9_.-]+\.(?:jpg|jpeg|png|webp)$~i', $rutaImagen);
+                            ?>
+                            <div class="foto-producto-picking">
+                                <?php if ($imagenValida): ?>
+                                    <img class="foto-miniatura"
+                                         src="<?= htmlspecialchars($rutaImagen, ENT_QUOTES, 'UTF-8') ?>"
+                                         alt="Foto de <?= htmlspecialchars($item['Descripcion'], ENT_QUOTES, 'UTF-8') ?>"
+                                         title="Hacé clic para ampliar"
+                                         onclick="abrirFotoPicking(this.src, this.alt)"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                                    <div class="foto-placeholder" style="display:none"><i class="bi bi-box-seam"></i></div>
+                                <?php else: ?>
+                                    <div class="foto-placeholder"><i class="bi bi-box-seam"></i></div>
+                                <?php endif; ?>
+                                <div class="datos-producto">
+                                    <span>PRODUCTO</span>
+                                    <strong><?= htmlspecialchars($item['Descripcion']) ?></strong>
+                                    <small>Código: #<?= (int)$item['ID_producto'] ?> · <?= htmlspecialchars($item['Categoria'] ?? '') ?></small>
+                                </div>
+                            </div>
                         </div>
-
 
 
                         <!-- UBICACIÓN -->
@@ -597,9 +599,28 @@ $primerItem = $hojaPicking[0];
 
 
 
+<div class="modal-foto-picking" id="modalFotoPicking" role="dialog" aria-modal="true" aria-label="Fotografía del producto" onclick="cerrarFotoPicking()">
+    <button type="button" class="cerrar-foto" aria-label="Cerrar imagen" onclick="cerrarFotoPicking()">&times;</button>
+    <img id="imagenAmpliadaPicking" alt="" onclick="event.stopPropagation()">
+</div>
+
 <!-- JAVASCRIPT -->
 
 <script>
+
+function abrirFotoPicking(src, alt) {
+    const modal = document.getElementById('modalFotoPicking');
+    const imagen = document.getElementById('imagenAmpliadaPicking');
+    imagen.src = src;
+    imagen.alt = alt;
+    modal.classList.add('abierto');
+}
+function cerrarFotoPicking() {
+    document.getElementById('modalFotoPicking').classList.remove('abierto');
+}
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') cerrarFotoPicking();
+});
 
 const botonesConfirmar =
     document.querySelectorAll(

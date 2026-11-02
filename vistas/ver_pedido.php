@@ -157,7 +157,7 @@ $puedeAsignarOperario =
         <div class="sidebar-logo">
 
             <img
-                src="/proyecto/smartpick/img/logoSinFondo.png"
+                src="img/logoSinFondo.png"
                 alt="SmartPick"
             >
 
@@ -287,7 +287,7 @@ $puedeAsignarOperario =
             <!-- OPERARIOS -->
 
             <a
-                href="#"
+                href="index.php?ruta=operarios"
                 class="menu-item"
             >
 
@@ -315,7 +315,7 @@ $puedeAsignarOperario =
             <!-- REPORTES -->
 
             <a
-                href="#"
+                href="index.php?ruta=reportes"
                 class="menu-item"
             >
 
@@ -424,6 +424,11 @@ $puedeAsignarOperario =
             </a>
 
 
+
+            <button type="button" id="descargarPdfPedido" class="volver" style="cursor:pointer; margin-left:12px; border:0; background:transparent; font:inherit;">
+                <i class="bi bi-file-earmark-pdf"></i>
+                Descargar PDF
+            </button>
 
             <!-- MENSAJE DE ÉXITO -->
 
@@ -1143,6 +1148,105 @@ $puedeAsignarOperario =
 
 </div>
 
+
+
+<!-- Bibliotecas para generar el comprobante PDF -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+// Los datos provienen del pedido cargado por PHP, no de valores de ejemplo.
+const datosPedido = <?= json_encode([
+    'id' => (int)$pedido['ID_pedido'],
+    'fechaIngreso' => $pedido['Fecha_ingresado'] ?? '',
+    'fechaEntrega' => $pedido['Fecha_entregado'] ?? '',
+    'estado' => $pedido['Estado'] ?? '',
+    'cliente' => $pedido['Cliente'] ?? '',
+    'ci' => $pedido['CI_cliente'] ?? '',
+    'mail' => $pedido['Mail_cliente'] ?? '',
+    'operario' => $pedido['Operario'] ?? '',
+    'productos' => array_map(function ($producto) {
+        return [
+            'id' => (int)($producto['ID_producto'] ?? 0),
+            'descripcion' => $producto['Descripcion'] ?? '',
+            'categoria' => $producto['Categoria'] ?? '',
+            'cantidad' => (int)($producto['Cantidad'] ?? 0)
+        ];
+    }, $productosPedido ?? [])
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?>;
+
+function fechaPdf(valor) {
+    if (!valor) return '-';
+    const partes = valor.substring(0, 10).split('-');
+    return partes.length === 3 ? partes[2] + '/' + partes[1] + '/' + partes[0] : valor;
+}
+
+function descargarComprobantePedido() {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert('No se pudo cargar jsPDF. Comprobá la conexión a Internet.');
+        return;
+    }
+
+    const pdf = new window.jspdf.jsPDF();
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(19);
+    pdf.text('SMARTPICK', 14, 20);
+    pdf.setFontSize(13);
+    pdf.text('Comprobante de pedido #' + datosPedido.id, 14, 31);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.text('Generado: ' + new Date().toLocaleString('es-UY'), 14, 40);
+
+    const detalles = [
+        ['Ingreso', fechaPdf(datosPedido.fechaIngreso)],
+        ['Entrega', fechaPdf(datosPedido.fechaEntrega)],
+        ['Estado', datosPedido.estado.replaceAll('_', ' ')],
+        ['Cliente', datosPedido.cliente || '-'],
+        ['CI', datosPedido.ci || '-'],
+        ['Correo', datosPedido.mail || '-'],
+        ['Operario asignado', datosPedido.operario || 'Sin asignar']
+    ];
+
+    if (typeof pdf.autoTable !== 'function') {
+        alert('No se pudo cargar AutoTable. Comprobá la conexión a Internet.');
+        return;
+    }
+
+    pdf.autoTable({
+        startY: 47,
+        head: [['Dato', 'Información']],
+        body: detalles,
+        theme: 'grid',
+        headStyles: { fillColor: [16, 47, 79] }
+    });
+
+    const filas = datosPedido.productos.map(producto => [
+        '#' + producto.id,
+        producto.descripcion,
+        producto.categoria,
+        String(producto.cantidad)
+    ]);
+
+    pdf.setFont('helvetica', 'bold');
+    const y = (pdf.lastAutoTable ? pdf.lastAutoTable.finalY : 47) + 13;
+    pdf.text('Productos del pedido', 14, y);
+    pdf.autoTable({
+        startY: y + 5,
+        head: [['Código', 'Producto', 'Categoría', 'Cantidad']],
+        body: filas.length ? filas : [['-', 'Sin productos registrados', '-', '-']],
+        theme: 'striped',
+        headStyles: { fillColor: [80, 162, 167] }
+    });
+
+    pdf.save('pedido_' + datosPedido.id + '_smartpick.pdf');
+}
+
+document.getElementById('descargarPdfPedido').addEventListener('click', descargarComprobantePedido);
+
+// Desde el listado, abrir el detalle y descargar el comprobante automáticamente.
+<?php if (($_GET['descargar'] ?? '') === '1'): ?>
+window.addEventListener('load', descargarComprobantePedido);
+<?php endif; ?>
+</script>
 
 </body>
 

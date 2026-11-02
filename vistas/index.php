@@ -110,7 +110,7 @@ $despachados = 8;
             </ul>
 
 
-            <a href="/proyecto/smartpick/index.php?ruta=login" class="btn btn-login">
+            <a href="index.php?ruta=login" class="btn btn-login">
 
                 <i class="bi bi-box-arrow-in-right"></i>
 
@@ -328,7 +328,7 @@ $despachados = 8;
         <div class="row align-items-center g-5">
 
 
-            <img src="img/fachada" alt="">
+            <img src="img/fachada.png" alt="">
 
             <div class="col-lg-5">
 

@@ -35,12 +35,12 @@ $usuario = $_SESSION['usuario'];
 
     <link
         rel="stylesheet"
-        href="/proyecto/smartpick/css/dashboard.css"
+        href="css/dashboard.css"
     >
 
     <link
         rel="stylesheet"
-        href="/proyecto/smartpick/css/pedidos.css"
+        href="css/pedidos.css"
     >
 
     <!-- ==========================================
@@ -93,7 +93,7 @@ $usuario = $_SESSION['usuario'];
 <div class="dashboard">
 
 
-    <!-- ==========================================
+   <!-- ==========================================
          SIDEBAR
     =========================================== -->
 
@@ -104,10 +104,7 @@ $usuario = $_SESSION['usuario'];
 
         <div class="sidebar-logo">
 
-            <img
-                src="/proyecto/smartpick/img/logoSinFondo.png"
-                alt="SmartPick"
-            >
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -117,13 +114,9 @@ $usuario = $_SESSION['usuario'];
 
         <nav class="sidebar-menu">
 
+        <!-- DASHBOARD -->
 
-            <!-- DASHBOARD -->
-
-            <a
-                href="index.php?ruta=dashboard"
-                class="menu-item"
-            >
+            <a href="index.php?ruta=dashboard" class="menu-item">
 
                 <i class="bi bi-grid"></i>
 
@@ -131,111 +124,66 @@ $usuario = $_SESSION['usuario'];
 
             </a>
 
-
             <!-- CLIENTES -->
 
-            <?php if (
-                strtolower($_SESSION['usuario']['rol'])
-                === 'administrador'
-            ): ?>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-                <a
-                    href="index.php?ruta=clientes"
-                    class="menu-item"
-                >
-
-                    <i class="bi bi-person-vcard"></i>
-
-                    <span>Clientes</span>
-
-                </a>
+            <a href="index.php?ruta=clientes" class="menu-item">
+                
+                <i class="bi bi-person-vcard"></i>
+        
+                <span>Clientes</span>
+            </a>
 
             <?php endif; ?>
-
 
             <!-- INGRESAR PAQUETE -->
 
-            <?php if (
-                strtolower($_SESSION['usuario']['rol'])
-                === 'administrador'
-            ): ?>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-                <a
-                    href="index.php?ruta=ingresar-paquete"
-                    class="menu-item"
-                >
-
-                    <i class="bi bi-box-arrow-in-down"></i>
-
-                    <span>Ingresar paquete</span>
-
-                </a>
+            <a href="index.php?ruta=ingresar-paquete" class="menu-item">
+                
+                <i class="bi bi-box-arrow-in-down"></i>
+                
+                <span>Ingresar paquete</span>
+            </a>
 
             <?php endif; ?>
-
 
             <!-- PRODUCTOS -->
 
-            <?php if (
-                strtolower($_SESSION['usuario']['rol'])
-                === 'administrador'
-            ): ?>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-                <a
-                    href="index.php?ruta=productos"
-                    class="menu-item"
-                >
-
-                    <i class="bi bi-box-seam"></i>
-
-                    <span>Productos</span>
-
-                </a>
+            <a href="index.php?ruta=productos" class="menu-item">
+                
+                <i class="bi bi-box-seam"></i>
+                
+                <span>Productos</span>
+            </a>
 
             <?php endif; ?>
-
 
             <!-- ZONAS -->
 
-            <a
-                href="index.php?ruta=zonas"
-                class="menu-item"
-            >
-
+            <a href="index.php?ruta=zonas" class="menu-item">
                 <i class="bi bi-geo-alt"></i>
-
                 <span>Zonas</span>
-
             </a>
-
 
             <!-- INVENTARIO -->
 
-            <?php if (
-                strtolower($_SESSION['usuario']['rol'])
-                === 'administrador'
-            ): ?>
+            <?php if (strtolower($_SESSION['usuario']['rol']) === 'administrador'): ?>
 
-                <a
-                    href="index.php?ruta=inventario"
-                    class="menu-item"
-                >
-
-                    <i class="bi bi-boxes"></i>
-
-                    <span>Inventario</span>
-
-                </a>
+            <a href="index.php?ruta=inventario" class="menu-item">
+                <i class="bi bi-boxes"></i>
+                <span>Inventario</span>
+            </a>
 
             <?php endif; ?>
 
-
             <!-- PEDIDOS -->
 
-            <a
-                href="index.php?ruta=pedidos"
-                class="menu-item activo"
-            >
+            <a href="index.php?ruta=pedidos" class="menu-item activo">
 
                 <i class="bi bi-clipboard-check"></i>
 
@@ -243,27 +191,21 @@ $usuario = $_SESSION['usuario'];
 
             </a>
 
-
             <!-- OPERARIOS -->
 
-            <a
-                href="#"
-                class="menu-item"
-            >
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=operarios" class="menu-item">
 
                 <i class="bi bi-people"></i>
 
                 <span>Operarios</span>
 
             </a>
-
+            <?php endif; ?>
 
             <!-- PICKING -->
 
-            <a
-                href="index.php?ruta=picking"
-                class="menu-item"
-            >
+            <a href="index.php?ruta=picking" class="menu-item">
 
                 <i class="bi bi-signpost-2"></i>
 
@@ -271,19 +213,17 @@ $usuario = $_SESSION['usuario'];
 
             </a>
 
-
             <!-- REPORTES -->
 
-            <a
-                href="#"
-                class="menu-item"
-            >
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=reportes" class="menu-item">
 
                 <i class="bi bi-bar-chart"></i>
 
                 <span>Reportes</span>
 
             </a>
+            <?php endif; ?>
 
 
         </nav>
@@ -706,6 +646,17 @@ $usuario = $_SESSION['usuario'];
                                     <td>
 
                                         <div class="acciones-tabla">
+
+
+                                            <!-- DESCARGAR COMPROBANTE PDF -->
+                                            <a
+                                                href="index.php?ruta=ver-pedido&amp;id=<?= (int)$pedido['ID_pedido'] ?>&amp;descargar=1"
+                                                class="btn-accion btn-pdf"
+                                                title="Descargar PDF del pedido"
+                                                aria-label="Descargar PDF del pedido #<?= (int)$pedido['ID_pedido'] ?>"
+                                            >
+                                                <i class="bi bi-file-earmark-pdf"></i>
+                                            </a>
 
 
                                             <!-- VER PEDIDO -->

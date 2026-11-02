@@ -58,7 +58,7 @@ unset($_SESSION['error_inventario']);
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 

@@ -1,5 +1,5 @@
 // js/login.js
-const API_BASE = 'http://localhost/proyecto/smartpick/api/';
+const API_BASE = 'api/';
 
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');

@@ -164,4 +164,60 @@ class DashboardRepositorio
             MYSQLI_ASSOC
         );
     }
+
+
+    // ==========================================
+    // REPORTES: STOCK POR CATEGORÍA
+    // ==========================================
+    public function obtenerStockPorCategoria()
+    {
+        $sql = "SELECT Categoria AS categoria,
+                       COALESCE(SUM(Stock_actual), 0) AS total
+                FROM producto
+                WHERE UPPER(Tipo) = 'ALMACEN'
+                GROUP BY Categoria
+                ORDER BY categoria ASC";
+
+        $resultado = mysqli_query($this->conexion, $sql);
+        if (!$resultado) {
+            throw new Exception('Error al consultar stock por categoría: ' . mysqli_error($this->conexion));
+        }
+        return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+    }
+
+    // ==========================================
+    // REPORTES: PRODUCTOS CON STOCK BAJO
+    // ==========================================
+    public function obtenerProductosStockBajo()
+    {
+        $sql = "SELECT ID_producto, Descripcion, Categoria,
+                       Stock_actual, Stock_minimo
+                FROM producto
+                WHERE UPPER(Tipo) = 'ALMACEN'
+                  AND Stock_actual <= Stock_minimo
+                ORDER BY Stock_actual ASC, Descripcion ASC";
+
+        $resultado = mysqli_query($this->conexion, $sql);
+        if (!$resultado) {
+            throw new Exception('Error al consultar productos con stock bajo: ' . mysqli_error($this->conexion));
+        }
+        return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+    }
+
+    // ==========================================
+    // REPORTES: PEDIDOS POR ESTADO
+    // ==========================================
+    public function obtenerPedidosPorEstado()
+    {
+        $sql = "SELECT Estado AS estado, COUNT(*) AS total
+                FROM pedido
+                GROUP BY Estado
+                ORDER BY Estado ASC";
+
+        $resultado = mysqli_query($this->conexion, $sql);
+        if (!$resultado) {
+            throw new Exception('Error al consultar pedidos por estado: ' . mysqli_error($this->conexion));
+        }
+        return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
+    }
 }

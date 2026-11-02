@@ -69,7 +69,7 @@ unset($_SESSION['error_paquete']);
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -158,13 +158,15 @@ unset($_SESSION['error_paquete']);
 
             <!-- OPERARIOS -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=operarios" class="menu-item">
 
                 <i class="bi bi-people"></i>
 
                 <span>Operarios</span>
 
             </a>
+            <?php endif; ?>
 
             <!-- PICKING -->
 
@@ -178,13 +180,15 @@ unset($_SESSION['error_paquete']);
 
             <!-- REPORTES -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=reportes" class="menu-item">
 
                 <i class="bi bi-bar-chart"></i>
 
                 <span>Reportes</span>
 
             </a>
+            <?php endif; ?>
 
 
         </nav>

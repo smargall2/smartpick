@@ -172,6 +172,7 @@ class PickingRepositorio
                 p.Tipo,
                 p.Categoria,
                 p.Stock_actual,
+                p.imagen AS imagen,
 
                 e.ID_zona,
 

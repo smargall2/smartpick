@@ -30,7 +30,7 @@
     <!-- CSS DEL LOGIN -->
     <link
         rel="stylesheet"
-        href="/proyecto/smartpick/css/login.css"
+        href="css/login.css"
     >
 
 </head>
@@ -46,11 +46,11 @@
     <header class="login-navbar">
 
         <a
-            href="/proyecto/smartpick/index.php"
+            href="index.php"
             class="login-logo"
         >
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" width="154" height="54">
+            <img src="img/logoSinFondo.png" width="154" height="54">
 
         </a>
 
@@ -90,7 +90,7 @@
             <!-- FORMULARIO -->
 
             <form
-                action="/proyecto/smartpick/index.php?ruta=login"
+                action="index.php?ruta=login"
                 method="POST"
                 class="form-login"
             >
@@ -166,20 +166,10 @@
 
 
 
-            <!-- RECUPERAR CONTRASEÑA -->
-
-            <a
-                href="#"
-                class="recuperar-password"
-            >
-                ¿Olvidaste tu contraseña?
-            </a>
-
-
             <!-- VOLVER -->
 
             <a
-                href="/proyecto/smartpick/"
+                href=""
                 class="volver-inicio"
             >
 

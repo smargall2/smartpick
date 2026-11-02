@@ -91,7 +91,7 @@ if ($zonaDestino > 0) {
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -180,13 +180,15 @@ if ($zonaDestino > 0) {
 
             <!-- OPERARIOS -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=operarios" class="menu-item">
 
                 <i class="bi bi-people"></i>
 
                 <span>Operarios</span>
 
             </a>
+            <?php endif; ?>
 
             <!-- PICKING -->
 
@@ -200,13 +202,15 @@ if ($zonaDestino > 0) {
 
             <!-- REPORTES -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=reportes" class="menu-item">
 
                 <i class="bi bi-bar-chart"></i>
 
                 <span>Reportes</span>
 
             </a>
+            <?php endif; ?>
 
 
         </nav>
@@ -232,7 +236,6 @@ if ($zonaDestino > 0) {
 
 
     </aside>
-
 
     <!-- CONTENIDO -->
    <main class="main-content mapa-contenido">

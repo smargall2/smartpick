@@ -69,7 +69,7 @@ unset($_SESSION['error_producto']);
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -158,13 +158,15 @@ unset($_SESSION['error_producto']);
 
             <!-- OPERARIOS -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=operarios" class="menu-item">
 
                 <i class="bi bi-people"></i>
 
                 <span>Operarios</span>
 
             </a>
+            <?php endif; ?>
 
             <!-- PICKING -->
 
@@ -178,13 +180,15 @@ unset($_SESSION['error_producto']);
 
             <!-- REPORTES -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=reportes" class="menu-item">
 
                 <i class="bi bi-bar-chart"></i>
 
                 <span>Reportes</span>
 
             </a>
+            <?php endif; ?>
 
 
         </nav>
@@ -461,8 +465,24 @@ unset($_SESSION['error_producto']);
 
                                         <div class="nombre-producto">
 
-                                            <div class="producto-icono">
-                                                <i class="bi bi-box-seam"></i>
+                                            <div class="producto-icono" style="overflow:hidden; width:48px; height:48px; flex-shrink:0;">
+                                                <?php
+                                                    $imagenProducto = $producto['imagen'] ?? '';
+                                                    $rutaImagenValida = is_string($imagenProducto)
+                                                        && preg_match('~^uploads/productos/[a-zA-Z0-9._-]+\.(?:jpg|jpeg|png|webp)$~i', $imagenProducto);
+                                                ?>
+                                                <?php if ($rutaImagenValida): ?>
+                                                    <img
+                                                        src="<?= htmlspecialchars($imagenProducto, ENT_QUOTES, 'UTF-8') ?>"
+                                                        alt="Imagen de <?= htmlspecialchars($producto['Descripcion'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        loading="lazy"
+                                                        style="width:100%;height:100%;object-fit:cover;border-radius:8px;"
+                                                        onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';"
+                                                    >
+                                                    <i class="bi bi-box-seam" style="display:none;"></i>
+                                                <?php else: ?>
+                                                    <i class="bi bi-box-seam"></i>
+                                                <?php endif; ?>
                                             </div>
 
                                             <strong>

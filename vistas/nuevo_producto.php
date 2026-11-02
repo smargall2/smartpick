@@ -65,7 +65,7 @@ unset($_SESSION['error_producto']);
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -274,6 +274,7 @@ unset($_SESSION['error_producto']);
             <form
                 action="index.php?ruta=nuevo-producto"
                 method="POST"
+                 enctype="multipart/form-data"
                 class="formulario-producto"
             >
 
@@ -464,6 +465,12 @@ unset($_SESSION['error_producto']);
 
                 </div>
 
+
+                <div class="campo campo-completo" style="margin-bottom: 20px;">
+                    <label for="imagen">IMAGEN DEL PRODUCTO (OPCIONAL)</label>
+                    <input type="file" name="imagen" id="imagen" accept="image/jpeg,image/png,image/webp">
+                    <small>JPG, PNG o WebP. Máximo 5 MB.</small>
+                </div>
 
                 <div
                     class="resumen-producto"

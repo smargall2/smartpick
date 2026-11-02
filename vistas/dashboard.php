@@ -41,7 +41,7 @@ $usuario = $_SESSION['usuario'];
     <!-- CSS -->
     <link
         rel="stylesheet"
-        href="/proyecto/smartpick/css/dashboard.css"
+        href="css/dashboard.css"
     >
 
 </head>
@@ -64,7 +64,7 @@ $usuario = $_SESSION['usuario'];
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -175,13 +175,15 @@ $usuario = $_SESSION['usuario'];
 
             <!-- REPORTES -->
 
-            <a href="#" class="menu-item">
+            <?php if (strtolower($usuario['rol']) === 'administrador'): ?>
+            <a href="index.php?ruta=reportes" class="menu-item">
 
                 <i class="bi bi-bar-chart"></i>
 
                 <span>Reportes</span>
 
             </a>
+            <?php endif; ?>
 
 
         </nav>
@@ -610,7 +612,9 @@ $usuario = $_SESSION['usuario'];
 
 
 
-                    <a href="#" class="accion">
+                    <a href="index.php?ruta=nuevo-producto" 
+                    class="accion"
+                    >
 
                         <i class="bi bi-box-seam"></i>
 
@@ -627,27 +631,6 @@ $usuario = $_SESSION['usuario'];
                         </div>
 
                     </a>
-
-
-
-                    <a href="#" class="accion">
-
-                        <i class="bi bi-geo-alt"></i>
-
-                        <div>
-
-                            <strong>
-                                Gestionar zonas
-                            </strong>
-
-                            <span>
-                                Configurar depósito
-                            </span>
-
-                        </div>
-
-                    </a>
-
 
 
                     <a href="index.php?ruta=operarios" class="accion">

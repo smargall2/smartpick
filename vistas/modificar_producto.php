@@ -65,7 +65,7 @@ unset($_SESSION['error_producto']);
 
         <div class="sidebar-logo">
 
-            <img src="/proyecto/smartpick/img/logoSinFondo.png" alt="SmartPick">
+            <img src="img/logoSinFondo.png" alt="SmartPick">
 
         </div>
 
@@ -276,6 +276,7 @@ unset($_SESSION['error_producto']);
             <form
                 action="index.php?ruta=modificar-producto"
                 method="POST"
+                enctype="multipart/form-data"
                 class="formulario-producto"
             >
 
@@ -507,6 +508,29 @@ unset($_SESSION['error_producto']);
 
                     </div>
 
+
+                    <!-- IMAGEN DEL PRODUCTO -->
+                    <div class="campo campo-completo">
+                        <label for="imagen">IMAGEN DEL PRODUCTO (OPCIONAL)</label>
+
+                        <?php if (!empty($producto['imagen'])): ?>
+                            <div style="margin: 12px 0;">
+                                <img
+                                    src="<?= htmlspecialchars($producto['imagen'], ENT_QUOTES, 'UTF-8') ?>"
+                                    alt="Imagen actual del producto"
+                                    style="max-width: 180px; max-height: 180px; object-fit: contain; border-radius: 8px;"
+                                >
+                            </div>
+                        <?php endif; ?>
+
+                        <input
+                            type="file"
+                            name="imagen"
+                            id="imagen"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        >
+                        <small>JPG, PNG o WebP. Máximo 5 MB. Si no seleccionás otra imagen, se conserva la actual.</small>
+                    </div>
 
                 </div>
 

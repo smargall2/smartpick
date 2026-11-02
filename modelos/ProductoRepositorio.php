@@ -24,7 +24,8 @@ class ProductoRepositorio
                 Descripcion,
                 Stock_actual,
                 Stock_minimo,
-                Categoria
+                Categoria,
+                imagen
             FROM producto
             ORDER BY Descripcion ASC
         ";
@@ -60,7 +61,8 @@ class ProductoRepositorio
                 Descripcion,
                 Stock_actual,
                 Stock_minimo,
-                Categoria
+                Categoria,
+                imagen
 
             FROM producto
 
@@ -128,7 +130,8 @@ class ProductoRepositorio
                 Descripcion,
                 Stock_actual,
                 Stock_minimo,
-                Categoria
+                Categoria,
+                imagen
 
             FROM producto
 
@@ -182,6 +185,7 @@ class ProductoRepositorio
                 p.Descripcion,
                 p.Tipo,
                 p.Categoria,
+                p.imagen,
                 p.Stock_actual,
                 p.Stock_minimo,
                 z.ID_zona,
@@ -229,7 +233,8 @@ class ProductoRepositorio
         $categoria,
         $stockActual,
         $stockMinimo,
-        $idZona
+        $idZona,
+        $imagen = null
     ) {
         try {
 
@@ -370,11 +375,13 @@ class ProductoRepositorio
                     Descripcion,
                     Stock_actual,
                     Stock_minimo,
-                    Categoria
+                    Categoria,
+                    imagen
                 )
                 VALUES
                 (
                     'ALMACEN',
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -395,11 +402,12 @@ class ProductoRepositorio
 
             mysqli_stmt_bind_param(
                 $stmtProducto,
-                "siis",
+                "siiss",
                 $descripcionNormalizada,
                 $stockActual,
                 $stockMinimo,
-                $categoria
+                $categoria,
+                $imagen
             );
 
             if (!mysqli_stmt_execute(
@@ -501,6 +509,7 @@ class ProductoRepositorio
                 p.ID_producto,
                 p.Descripcion,
                 p.Categoria,
+                p.imagen,
                 p.Stock_actual,
                 p.Stock_minimo,
                 e.ID_zona,
@@ -564,7 +573,8 @@ class ProductoRepositorio
         $descripcion,
         $categoria,
         $stockMinimo,
-        $idZona
+        $idZona,
+        $imagen = null
     ) {
         try {
 
@@ -771,7 +781,8 @@ class ProductoRepositorio
                 SET
                     Descripcion = ?,
                     Categoria = ?,
-                    Stock_minimo = ?
+                    Stock_minimo = ?,
+                    imagen = COALESCE(?, imagen)
 
                 WHERE ID_producto = ?
                   AND UPPER(Tipo) = 'ALMACEN'
@@ -790,10 +801,11 @@ class ProductoRepositorio
 
             mysqli_stmt_bind_param(
                 $stmtActualizar,
-                "ssii",
+                "ssisi",
                 $descripcionNormalizada,
                 $categoria,
                 $stockMinimo,
+                $imagen,
                 $idProducto
             );
 
@@ -887,6 +899,7 @@ class ProductoRepositorio
                 p.ID_producto,
                 p.Descripcion,
                 p.Categoria,
+                p.imagen,
                 p.Stock_actual,
                 p.Stock_minimo,
                 z.Nombre AS Zona,
@@ -1105,6 +1118,7 @@ class ProductoRepositorio
                 p.ID_producto,
                 p.Descripcion,
                 p.Categoria,
+                p.imagen,
 
                 pe.ID_pedido,
                 pe.Fecha_ingresado,

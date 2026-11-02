@@ -50,6 +50,52 @@ $zonaRepositorio = new ZonaRepositorio($conexion);
 $paqueteRepositorio = new PaqueteRepositorio($conexion);
 
 // =====================================
+// IMÁGENES DE PRODUCTOS
+// =====================================
+// Devuelve una ruta relativa o null cuando no se adjunta imagen.
+function guardarImagenProducto($archivo)
+{
+    if (!isset($archivo) || $archivo['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    if ($archivo['error'] !== UPLOAD_ERR_OK) {
+        throw new Exception('No se pudo subir la imagen del producto.');
+    }
+
+    if ($archivo['size'] > 5 * 1024 * 1024) {
+        throw new Exception('La imagen no puede superar los 5 MB.');
+    }
+
+    if (!is_uploaded_file($archivo['tmp_name'])) {
+        throw new Exception('El archivo recibido no es válido.');
+    }
+
+    $tipo = (new finfo(FILEINFO_MIME_TYPE))->file($archivo['tmp_name']);
+    $extensiones = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp'
+    ];
+
+    if (!isset($extensiones[$tipo]) || @getimagesize($archivo['tmp_name']) === false) {
+        throw new Exception('Solo se permiten imágenes JPG, PNG o WebP.');
+    }
+
+    $carpeta = __DIR__ . '/uploads/productos';
+    if (!is_dir($carpeta) && !mkdir($carpeta, 0755, true) && !is_dir($carpeta)) {
+        throw new Exception('No se pudo crear la carpeta de imágenes.');
+    }
+
+    $nombre = bin2hex(random_bytes(16)) . '.' . $extensiones[$tipo];
+    if (!move_uploaded_file($archivo['tmp_name'], $carpeta . '/' . $nombre)) {
+        throw new Exception('No se pudo guardar la imagen en el servidor.');
+    }
+
+    return 'uploads/productos/' . $nombre;
+}
+
+// =====================================
 // RUTA
 // =====================================
 
@@ -1619,7 +1665,9 @@ case 'nuevo-producto':
         }
 
 
+        $rutaImagen = null;
         try {
+            $rutaImagen = guardarImagenProducto($_FILES['imagen'] ?? null);
 
             $idProducto =
                 $productoRepositorio
@@ -1628,7 +1676,8 @@ case 'nuevo-producto':
                         $categoria,
                         $stockActual,
                         $stockMinimo,
-                        $idZona
+                        $idZona,
+                        $rutaImagen
                     );
 
 
@@ -1645,6 +1694,9 @@ case 'nuevo-producto':
 
 
         } catch (Exception $e) {
+            if ($rutaImagen !== null) {
+                @unlink(__DIR__ . '/' . $rutaImagen);
+            }
 
             $_SESSION['error_producto'] =
                 $e->getMessage();
@@ -1782,7 +1834,9 @@ case 'modificar-producto':
         }
 
 
+        $rutaImagen = null;
         try {
+            $rutaImagen = guardarImagenProducto($_FILES['imagen'] ?? null);
 
             $productoRepositorio
                 ->modificarProductoAlmacen(
@@ -1790,7 +1844,8 @@ case 'modificar-producto':
                     $descripcion,
                     $categoria,
                     $stockMinimo,
-                    $idZona
+                    $idZona,
+                    $rutaImagen
                 );
 
 
@@ -1806,6 +1861,9 @@ case 'modificar-producto':
 
 
         } catch (Exception $e) {
+            if ($rutaImagen !== null) {
+                @unlink(__DIR__ . '/' . $rutaImagen);
+            }
 
             $_SESSION['error_producto'] =
                 $e->getMessage();
@@ -2037,6 +2095,31 @@ case 'zonas':
     require_once __DIR__ . '/vistas/zonas.php';
 
     break;
+
+    // ---------------------------------
+    // REPORTES (ADMINISTRADOR)
+    // ---------------------------------
+
+    case 'reportes':
+
+        if (!isset($_SESSION['usuario'])) {
+            header('Location: index.php?ruta=login');
+            exit;
+        }
+
+        if (strtolower($_SESSION['usuario']['rol']) !== 'administrador') {
+            http_response_code(403);
+            exit('No tiene permisos para ver reportes.');
+        }
+
+        $stockTotal = $dashboardRepositorio->obtenerStockTotal();
+        $pedidosPendientes = $dashboardRepositorio->obtenerPedidosPendientes();
+        $stockPorCategoria = $dashboardRepositorio->obtenerStockPorCategoria();
+        $productosStockBajo = $dashboardRepositorio->obtenerProductosStockBajo();
+        $pedidosPorEstado = $dashboardRepositorio->obtenerPedidosPorEstado();
+
+        require_once __DIR__ . '/vistas/reportes.php';
+        break;
 
     // ---------------------------------
     // CERRAR SESIÓN
