@@ -1761,7 +1761,7 @@ public function modificarEntregaPendiente(
                 SELECT
                     COUNT(*) AS pendientes
 
-                FROM PickingDetalle
+                FROM pickingdetalle
 
                 WHERE ID_pedido = ?
 

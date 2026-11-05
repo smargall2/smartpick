@@ -31,21 +31,21 @@ class PickingRepositorio
                     ELSE 'ALMACEN'
                 END AS Tipo_pedido
 
-            FROM Atiende a
+            FROM atiende a
 
-            INNER JOIN Pedido pe
+            INNER JOIN pedido pe
                 ON pe.ID_pedido = a.ID_pedido
 
-            INNER JOIN Recibe_entrega re
+            INNER JOIN recibe_entrega re
                 ON re.ID_pedido = pe.ID_pedido
 
-            INNER JOIN Persona pc
+            INNER JOIN persona pc
                 ON pc.CI = re.CI_cliente
 
-            INNER JOIN Contiene c
+            INNER JOIN contiene c
                 ON c.ID_pedido = pe.ID_pedido
 
-            INNER JOIN Producto p
+            INNER JOIN producto p
                 ON p.ID_producto = c.ID_producto
 
             WHERE a.CI_operario = ?
@@ -96,7 +96,7 @@ class PickingRepositorio
     public function inicializarPicking($idPedido)
     {
         $sql = "
-            INSERT IGNORE INTO PickingDetalle
+            INSERT IGNORE INTO pickingdetalle
             (
                 ID_pedido,
                 ID_producto,
@@ -108,7 +108,7 @@ class PickingRepositorio
                 c.ID_producto,
                 0
 
-            FROM Contiene c
+            FROM contiene c
 
             WHERE c.ID_pedido = ?
         ";
@@ -183,30 +183,30 @@ class PickingRepositorio
                 pd.Confirmado,
                 pd.Fecha_confirmacion
 
-            FROM Pedido pe
+            FROM pedido pe
 
-            INNER JOIN Atiende a
+            INNER JOIN atiende a
                 ON a.ID_pedido = pe.ID_pedido
 
-            INNER JOIN Recibe_entrega re
+            INNER JOIN recibe_entrega re
                 ON re.ID_pedido = pe.ID_pedido
 
-            INNER JOIN Persona cliente
+            INNER JOIN persona cliente
                 ON cliente.CI = re.CI_cliente
 
-            INNER JOIN Contiene c
+            INNER JOIN contiene c
                 ON c.ID_pedido = pe.ID_pedido
 
-            INNER JOIN Producto p
+            INNER JOIN producto p
                 ON p.ID_producto = c.ID_producto
 
-            LEFT JOIN Esta e
+            LEFT JOIN esta e
                 ON e.ID_producto = p.ID_producto
 
-            LEFT JOIN Zona z
+            LEFT JOIN zona z
                 ON z.ID_zona = e.ID_zona
 
-            LEFT JOIN PickingDetalle pd
+            LEFT JOIN pickingdetalle pd
                 ON pd.ID_pedido = pe.ID_pedido
                 AND pd.ID_producto = p.ID_producto
 
@@ -286,9 +286,9 @@ class PickingRepositorio
                     pe.ID_pedido,
                     pe.Estado
 
-                FROM Pedido pe
+                FROM pedido pe
 
-                INNER JOIN Atiende a
+                INNER JOIN atiende a
                     ON a.ID_pedido = pe.ID_pedido
 
                 WHERE pe.ID_pedido = ?
@@ -354,9 +354,9 @@ class PickingRepositorio
                     p.Descripcion,
                     p.Tipo
 
-                FROM Contiene c
+                FROM contiene c
 
-                INNER JOIN Producto p
+                INNER JOIN producto p
                     ON p.ID_producto = c.ID_producto
 
                 WHERE c.ID_pedido = ?
@@ -417,7 +417,7 @@ class PickingRepositorio
                 SELECT
                     Confirmado
 
-                FROM PickingDetalle
+                FROM pickingdetalle
 
                 WHERE ID_pedido = ?
 
@@ -505,7 +505,7 @@ class PickingRepositorio
 
 
                 $sqlStock = "
-                    UPDATE Producto
+                    UPDATE producto
 
                     SET Stock_actual =
                         Stock_actual - ?
@@ -554,7 +554,7 @@ class PickingRepositorio
             // =========================================
 
             $sqlConfirmar = "
-                UPDATE PickingDetalle
+                UPDATE pickingdetalle
 
                 SET
                     Confirmado = 1,
@@ -608,7 +608,7 @@ class PickingRepositorio
                 SELECT
                     COUNT(*) AS pendientes
 
-                FROM PickingDetalle
+                FROM pickingdetalle
 
                 WHERE ID_pedido = ?
 
@@ -662,7 +662,7 @@ class PickingRepositorio
             if ($terminado) {
 
                 $sqlEstado = "
-                    UPDATE Pedido
+                    UPDATE pedido
 
                     SET Estado =
                         'LISTO_PARA_VALIDAR'
